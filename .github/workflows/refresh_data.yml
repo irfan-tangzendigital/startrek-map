@@ -1,0 +1,30 @@
+name: Refresh STAPI data
+
+on:
+  schedule:
+    - cron: "0 3 * * 1" # Mondays 3am UTC
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run pipeline
+        run: node scripts/run_pipeline.js
+
+      - name: Commit updated data
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: refresh STAPI system data"
+          file_pattern: src/data/systems.json
+
