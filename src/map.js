@@ -248,43 +248,24 @@ export function createMap({
 }
 
 function drawBackground({ bgLayer, worldWidth, worldHeight }) {
-  bgLayer.addChild(
-    new PIXI.Graphics().beginFill(0x000011).drawRect(0, 0, worldWidth, worldHeight).endFill(),
+  const bg = PIXI.Sprite.from('/shakaar_map.jpg');
+  bg.width = worldWidth;
+  bg.height = worldHeight;
+  bgLayer.addChildAt(bg, 0);
+
+  const credit = new PIXI.Text(
+    "© Shakaar's Alpha/Beta Map v3.3",
+    new PIXI.TextStyle({
+      fontFamily: 'Antonio,Courier New',
+      fontSize: 10,
+      fill: 0xffffff,
+    }),
   );
-
-  const core = new PIXI.Graphics();
-  core.beginFill(0x1a0840, 0.28).drawEllipse(1100, 820, 680, 440).endFill();
-  core.beginFill(0x260d55, 0.16).drawEllipse(1100, 820, 400, 260).endFill();
-  bgLayer.addChild(core);
-
-  const stars = new PIXI.Graphics();
-  const rng = mulberry32(12345);
-  for (let i = 0; i < 4500; i++) {
-    const x = rng() * worldWidth;
-    const y = rng() * worldHeight;
-    const r = rng() < 0.7 ? 0.5 : rng() < 0.15 ? 1.5 : 1;
-    stars.beginFill(rng() < 0.12 ? 0xaabbff : 0xffffff, 0.25 + rng() * 0.75).drawCircle(x, y, r).endFill();
-  }
-  bgLayer.addChild(stars);
-
-  const qs = new PIXI.TextStyle({
-    fontFamily: 'Antonio,Courier New',
-    fontSize: 53,
-    fill: 0xffffff,
-    letterSpacing: 10,
-    fontWeight: '700',
-  });
-  const aq = new PIXI.Text('ALPHA QUADRANT', qs);
-  aq.alpha = 0.028;
-  aq.x = 60;
-  aq.y = 50;
-  bgLayer.addChild(aq);
-
-  const bq = new PIXI.Text('BETA QUADRANT', qs);
-  bq.alpha = 0.028;
-  bq.x = 1280;
-  bq.y = 50;
-  bgLayer.addChild(bq);
+  credit.alpha = 0.35;
+  credit.anchor.set(1, 1);
+  credit.x = worldWidth - 10;
+  credit.y = worldHeight - 10;
+  bgLayer.addChild(credit);
 }
 
 function drawTerritories({ overlayLayer, territories, factions }) {
@@ -292,10 +273,6 @@ function drawTerritories({ overlayLayer, territories, factions }) {
   territories.forEach((t) => {
     const f = factions[t.faction];
     if (!f) return;
-    overlayLayer.addChild(new PIXI.Graphics().beginFill(f.color, 0.09).drawPolygon(t.points).endFill());
-    const out = new PIXI.Graphics();
-    out.lineStyle(0.8, f.color, 0.28).drawPolygon(t.points);
-    overlayLayer.addChild(out);
 
     const pts = t.points;
     let cx = 0;
@@ -311,7 +288,7 @@ function drawTerritories({ overlayLayer, territories, factions }) {
       new PIXI.TextStyle({
         fontFamily: 'Antonio,Courier New',
         fontSize: 25,
-        fill: f.color,
+        fill: 0xffffff,
         letterSpacing: 5,
         fontWeight: '700',
       }),
@@ -410,16 +387,6 @@ function updateLabelsVisibility({ sysMap, world, activeFactions }) {
     dot.visible = enabled;
     lbl.visible = enabled && show;
   });
-}
-
-function mulberry32(seed) {
-  return function () {
-    seed |= 0;
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
 }
 
 function easeInOut(t) {
