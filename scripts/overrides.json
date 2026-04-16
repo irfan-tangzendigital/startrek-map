@@ -1,0 +1,911 @@
+{
+  "Sol": {
+    "id": "sol",
+    "subtitle": "Earth · Sector 001",
+    "x": 1060,
+    "y": 775,
+    "faction": "federation",
+    "size": "capital",
+    "classification": "Class M",
+    "quadrant": "Alpha",
+    "sector": "Sector 001",
+    "coordinates": "0 / 0 / 0",
+    "population": "~9 billion (Earth only)",
+    "memAlpha": "Earth",
+    "desc": "Homeworld of Humanity and the beating heart of the United Federation of Planets. Starfleet Command is in San Francisco, California; the Federation Council meets in Paris. Sol is the most strategically important system in the Alpha Quadrant.",
+    "events": [
+      {
+        "year": 2063,
+        "text": "Zefram Cochrane achieves warp flight; first contact with Vulcans at Bozeman, Montana"
+      },
+      {
+        "year": 2161,
+        "text": "United Federation of Planets founded at San Francisco"
+      },
+      {
+        "year": 2367,
+        "text": "Borg cube destroyed near Wolf 359 after devastating the fleet"
+      },
+      {
+        "year": 2375,
+        "text": "Breen attack on Starfleet Headquarters during the Dominion War"
+      }
+    ],
+    "characters": [
+      "James T. Kirk",
+      "Jean-Luc Picard",
+      "Benjamin Sisko",
+      "Kathryn Janeway",
+      "Jonathan Archer",
+      "Michael Burnham"
+    ],
+    "shows": [
+      "TOS",
+      "TNG",
+      "DS9",
+      "VOY",
+      "ENT",
+      "PIC",
+      "SNW",
+      "DSC"
+    ]
+  },
+  "Sol system": {
+    "id": "sol",
+    "subtitle": "Earth · Sector 001",
+    "x": 1060,
+    "y": 775,
+    "faction": "federation",
+    "size": "capital",
+    "classification": "Class M",
+    "quadrant": "Alpha",
+    "sector": "Sector 001",
+    "coordinates": "0 / 0 / 0",
+    "population": "~9 billion (Earth only)",
+    "memAlpha": "Earth",
+    "desc": "Homeworld of Humanity and the beating heart of the United Federation of Planets. Starfleet Command is in San Francisco, California; the Federation Council meets in Paris. Sol is the most strategically important system in the Alpha Quadrant.",
+    "events": [
+      {
+        "year": 2063,
+        "text": "Zefram Cochrane achieves warp flight; first contact with Vulcans at Bozeman, Montana"
+      },
+      {
+        "year": 2161,
+        "text": "United Federation of Planets founded at San Francisco"
+      },
+      {
+        "year": 2367,
+        "text": "Borg cube destroyed near Wolf 359 after devastating the fleet"
+      },
+      {
+        "year": 2375,
+        "text": "Breen attack on Starfleet Headquarters during the Dominion War"
+      }
+    ],
+    "characters": [
+      "James T. Kirk",
+      "Jean-Luc Picard",
+      "Benjamin Sisko",
+      "Kathryn Janeway",
+      "Jonathan Archer",
+      "Michael Burnham"
+    ],
+    "shows": [
+      "TOS",
+      "TNG",
+      "DS9",
+      "VOY",
+      "ENT",
+      "PIC",
+      "SNW",
+      "DSC"
+    ]
+  },
+  "Vulcan": {
+    "id": "vulcan",
+    "subtitle": "40 Eridani A · 16.5 ly from Sol",
+    "x": 1150,
+    "y": 845,
+    "faction": "federation",
+    "size": "major",
+    "classification": "Class M",
+    "quadrant": "Alpha",
+    "sector": "Sector 001 (adjacent)",
+    "coordinates": "+16.5 / −1.4 / −2.1",
+    "population": "~4.9 billion",
+    "memAlpha": "Vulcan_(planet)",
+    "desc": "Harsh, arid homeworld of the Vulcans — a founding member of the Federation. The Vulcan Science Academy and the Vulcan High Command are based here. Vulcan philosophers developed the disciplines of Surak's logic that shaped interstellar history.",
+    "events": [
+      {
+        "year": 370,
+        "text": "Surak introduces the philosophy of logic and emotional control"
+      },
+      {
+        "year": 2154,
+        "text": "Syrrannite movement restores Surak's original teachings"
+      },
+      {
+        "year": 2258,
+        "text": "Vulcan destroyed by Nero's red matter in the Kelvin timeline"
+      }
+    ],
+    "characters": [
+      "Spock",
+      "T'Pol",
+      "Sarek",
+      "T'Pau",
+      "Tuvok",
+      "Saavik"
+    ],
+    "shows": [
+      "TOS",
+      "TNG",
+      "ENT",
+      "DSC",
+      "SNW",
+      "PIC"
+    ]
+  },
+  "Andoria": {
+    "id": "andoria",
+    "subtitle": "Moon of Andor · Procyon system",
+    "x": 940,
+    "y": 670,
+    "faction": "federation",
+    "size": "major",
+    "classification": "Class M (moon)",
+    "quadrant": "Alpha",
+    "sector": "Sector 006",
+    "coordinates": "−11.2 / +2.3 / +5.9",
+    "population": "~3.5 billion",
+    "memAlpha": "Andoria",
+    "desc": "Frigid, ice-covered moon of the gas giant Andor. Home of the blue-skinned, antenna-bearing Andorians — fierce warriors and proud founding members of the Federation. The Imperial Guard is headquartered here.",
+    "events": [
+      {
+        "year": 2154,
+        "text": "Andorian-Vulcan tensions defused with help of Enterprise NX-01"
+      },
+      {
+        "year": 2161,
+        "text": "Andorians sign the Federation Charter alongside Humans, Vulcans, and Tellarites"
+      }
+    ],
+    "characters": [
+      "Shran",
+      "Thy'lek Shran",
+      "Hemmer"
+    ],
+    "shows": [
+      "TOS",
+      "ENT",
+      "DSC",
+      "SNW"
+    ]
+  },
+  "Betazed": {
+    "id": "betazed",
+    "subtitle": "Iota Cassiopeia sector",
+    "x": 1000,
+    "y": 820,
+    "faction": "federation",
+    "size": "major",
+    "classification": "Class M",
+    "quadrant": "Alpha",
+    "sector": "Sector 1607",
+    "coordinates": "+14.9 / +0.7 / −1.2",
+    "population": "~5 billion",
+    "memAlpha": "Betazed",
+    "desc": "Homeworld of the empathic and telepathic Betazoids. Betazed is known for its lush forests and warm climate. During the Dominion War, the planet fell to Dominion forces — a critical strategic blow to the Federation.",
+    "events": [
+      {
+        "year": 2374,
+        "text": "Betazed falls to Dominion occupation after only 10 hours of resistance"
+      },
+      {
+        "year": 2375,
+        "text": "Betazed liberated near the end of the Dominion War"
+      }
+    ],
+    "characters": [
+      "Deanna Troi",
+      "Lwaxana Troi",
+      "Lon Suder"
+    ],
+    "shows": [
+      "TNG",
+      "DS9"
+    ]
+  },
+  "Trill": {
+    "id": "trill",
+    "subtitle": "Trill system · Alpha Quadrant",
+    "x": 1090,
+    "y": 715,
+    "faction": "federation",
+    "size": "major",
+    "classification": "Class M",
+    "quadrant": "Alpha",
+    "sector": "Sector 1385",
+    "coordinates": "+12.3 / +1.8 / +0.9",
+    "population": "~8 billion (of which ~1,000 symbionts)",
+    "memAlpha": "Trill_(planet)",
+    "desc": "Homeworld of the Trill, remarkable for their unique symbiosis with ancient worm-like creatures called symbionts. Only the best candidates are selected for joining, carrying the symbiont's centuries of accumulated memories.",
+    "events": [
+      {
+        "year": "Unknown",
+        "text": "Symbiosis tradition begins; exact origin lost to history"
+      },
+      {
+        "year": 2367,
+        "text": "Federation learns of the symbiont connection — previously a closely guarded secret"
+      }
+    ],
+    "characters": [
+      "Jadzia Dax",
+      "Ezri Dax",
+      "Curzon Dax"
+    ],
+    "shows": [
+      "TNG",
+      "DS9"
+    ]
+  },
+  "Tellar Prime": {
+    "id": "tellar",
+    "subtitle": "61 Cygni · 11.4 ly from Sol",
+    "x": 880,
+    "y": 800,
+    "faction": "federation",
+    "size": "major",
+    "classification": "Class M",
+    "quadrant": "Alpha",
+    "sector": "Sector 007",
+    "coordinates": "+11.4 / −0.5 / +0.2",
+    "population": "~4.2 billion",
+    "memAlpha": "Tellar_Prime",
+    "desc": "Homeworld of the Tellarites, stocky pig-snouted humanoids famous for their combative debating culture. Arguing is a form of social greeting in Tellarite society. Founding member of the Federation.",
+    "events": [
+      {
+        "year": 2154,
+        "text": "Tellarite ambassador Gral participates in the Coalition of Planets conference"
+      },
+      {
+        "year": 2161,
+        "text": "Tellar Prime signs the Federation Charter"
+      }
+    ],
+    "characters": [
+      "Gral",
+      "Thy'lek (ambassador)"
+    ],
+    "shows": [
+      "TOS",
+      "ENT",
+      "SNW"
+    ]
+  },
+  "Denobula": {
+    "id": "denobula",
+    "subtitle": "Denobula Triaxa system",
+    "x": 820,
+    "y": 720,
+    "faction": "federation",
+    "size": "minor",
+    "classification": "Class M",
+    "quadrant": "Alpha",
+    "sector": "Sector 0441",
+    "coordinates": "−22.1 / +3.1 / +4.2",
+    "population": "~12 billion (densely populated)",
+    "memAlpha": "Denobula_Triaxa",
+    "desc": "A remarkably overcrowded homeworld — Denobulan society adapted to extreme population density through communal living and large extended family groups. Denobulans practice polygamous marriage and are unusually cheerful as a species.",
+    "events": [
+      {
+        "year": 2151,
+        "text": "Dr. Phlox joins Enterprise NX-01 as Chief Medical Officer through the Interspecies Medical Exchange"
+      }
+    ],
+    "characters": [
+      "Phlox"
+    ],
+    "shows": [
+      "ENT"
+    ]
+  },
+  "Wolf 359": {
+    "id": "wolf359",
+    "subtitle": "Site of the Battle of Wolf 359",
+    "x": 870,
+    "y": 850,
+    "faction": "independent",
+    "size": "minor",
+    "classification": "Red dwarf (M8 Ve)",
+    "quadrant": "Alpha",
+    "sector": "Sector 001 approach",
+    "coordinates": "−7.8 / −0.2 / +0.1",
+    "population": "None (uninhabited debris field)",
+    "memAlpha": "Battle_of_Wolf_359",
+    "desc": "A red dwarf star system 7.8 light years from Sol — the site of the most catastrophic defeat in Starfleet history. On Stardate 44002.3, a single Borg cube destroyed 39 starships and killed 11,000 crew. The wreckage remained for years as a memorial.",
+    "events": [
+      {
+        "year": 2367,
+        "text": "Battle of Wolf 359: 39 Federation starships destroyed by a single Borg cube; 11,000 lives lost"
+      },
+      {
+        "year": 2367,
+        "text": "The cube is destroyed near Sol by the Enterprise-D using a dormant Locutus command"
+      }
+    ],
+    "characters": [
+      "Locutus of Borg (Jean-Luc Picard)",
+      "Benjamin Sisko (survivor)",
+      "Jennifer Sisko (killed in action)"
+    ],
+    "shows": [
+      "TNG",
+      "DS9"
+    ]
+  },
+  "Risa": {
+    "id": "risa",
+    "subtitle": "Hoobishan Baths · Epsilon Ceti system",
+    "x": 1240,
+    "y": 650,
+    "faction": "independent",
+    "size": "minor",
+    "classification": "Class M (weather-controlled)",
+    "quadrant": "Alpha",
+    "sector": "Sector 1156",
+    "coordinates": "+58 / +3 / +2",
+    "population": "~500 million",
+    "memAlpha": "Risa",
+    "desc": "The Federation's premier resort world, with a climate engineered to be tropical year-round via weather modification technology. Risian society is open and welcoming — the Horga'hn statuette signals an openness to Jamaharon.",
+    "events": [
+      {
+        "year": 2366,
+        "text": "Enterprise-D crew vacation disrupted by Vorgon criminals seeking the Tox Uthat"
+      },
+      {
+        "year": 2152,
+        "text": "Risa vacation disrupted by a Suliban agent stealing Enterprise's plasma injectors"
+      }
+    ],
+    "characters": [
+      "Vanessa (Risian host)"
+    ],
+    "shows": [
+      "TNG",
+      "DS9",
+      "ENT"
+    ]
+  },
+  "Talos IV": {
+    "id": "talos4",
+    "subtitle": "Talos star group",
+    "x": 870,
+    "y": 595,
+    "faction": "independent",
+    "size": "minor",
+    "classification": "Class M",
+    "quadrant": "Alpha",
+    "sector": "Sector 1385 (edge)",
+    "coordinates": "−96 / +12 / +8",
+    "population": "Talosians (unknown number, underground)",
+    "memAlpha": "Talos_IV",
+    "desc": "Forbidden world of the reclusive, big-headed Talosians. Their powerful telepathic abilities create perfect illusions indistinguishable from reality. Starfleet General Order 7 — the only death-penalty order remaining in Federation law — prohibits all contact.",
+    "events": [
+      {
+        "year": 2254,
+        "text": "Captain Christopher Pike held captive by Talosians; the Menagerie incident"
+      },
+      {
+        "year": 2267,
+        "text": "Spock returns Pike to Talos IV in violation of General Order 7"
+      }
+    ],
+    "characters": [
+      "Christopher Pike",
+      "Vina",
+      "The Keeper (Talosian)"
+    ],
+    "shows": [
+      "TOS",
+      "SNW"
+    ]
+  },
+  "Qo'noS": {
+    "id": "qonos",
+    "subtitle": "First City · Kling system",
+    "x": 1590,
+    "y": 720,
+    "faction": "klingon",
+    "size": "capital",
+    "classification": "Class M",
+    "quadrant": "Beta",
+    "sector": "Sector 70505",
+    "coordinates": "+117 / −3 / +22",
+    "population": "~5.4 billion",
+    "memAlpha": "Qo'noS",
+    "desc": "The Klingon homeworld — a geologically volatile planet scarred by ancient tectonic upheavals. The Great Hall of the High Council stands in the First City. Klingon culture celebrates honour, combat, and glorious death in battle above all else.",
+    "events": [
+      {
+        "year": 930,
+        "text": "Kahless the Unforgettable unites the Klingon people; creates the bat'leth"
+      },
+      {
+        "year": 2293,
+        "text": "Khitomer Accords signed after Praxis moon explosion devastates Klingon economy"
+      },
+      {
+        "year": 2366,
+        "text": "K'mpec poisoned; Gowron rises to Chancellor with Picard as Arbiter of Succession"
+      },
+      {
+        "year": 2373,
+        "text": "Klingon-Federation alliance strained as Chancellor Gowron invades Cardassian space"
+      }
+    ],
+    "characters": [
+      "Kahless",
+      "Kor",
+      "Kang",
+      "Koloth",
+      "Worf",
+      "Martok",
+      "Gowron",
+      "K'mpec",
+      "J'mpok"
+    ],
+    "shows": [
+      "TOS",
+      "TNG",
+      "DS9",
+      "DSC",
+      "SNW",
+      "PIC"
+    ]
+  },
+  "Khitomer": {
+    "id": "khitomer",
+    "subtitle": "Khitomer system · Beta Quadrant",
+    "x": 1460,
+    "y": 575,
+    "faction": "klingon",
+    "size": "minor",
+    "classification": "Class M",
+    "quadrant": "Beta",
+    "sector": "Sector 23600",
+    "coordinates": "+95 / −4 / +18",
+    "population": "Former colony (largely abandoned after massacre)",
+    "memAlpha": "Khitomer",
+    "desc": "Site of both the historic Khitomer Accords (2293) establishing Federation-Klingon peace, and the Romulan massacre of 2346 that killed over 4,000 Klingon colonists. Worf's parents died here; he was raised by Sergey Rozhenko.",
+    "events": [
+      {
+        "year": 2293,
+        "text": "Khitomer Accords signed by the Federation and Klingon Empire"
+      },
+      {
+        "year": 2346,
+        "text": "Romulan attack destroys the Klingon colony; 4,000+ killed"
+      },
+      {
+        "year": 2367,
+        "text": "Enterprise-D exposes Duras family's treachery in the massacre"
+      }
+    ],
+    "characters": [
+      "Worf",
+      "Mogh (Worf's father, killed here)",
+      "Ja'rod (Duras traitor)"
+    ],
+    "shows": [
+      "TNG",
+      "DS9",
+      "PIC"
+    ]
+  },
+  "Narendra III": {
+    "id": "narendra3",
+    "subtitle": "Narendra system",
+    "x": 1530,
+    "y": 800,
+    "faction": "klingon",
+    "size": "minor",
+    "classification": "Class M",
+    "quadrant": "Beta",
+    "sector": "Sector 21459",
+    "coordinates": "+101 / −8 / +26",
+    "population": "Former colony; partially resettled",
+    "memAlpha": "Narendra_III",
+    "desc": "In 2344, the USS Enterprise-C answered a distress call from this Klingon colony under Romulan attack, sacrificing itself. The act of self-sacrifice so moved the Klingons that it forged the lasting Federation-Klingon alliance that held through the Dominion War.",
+    "events": [
+      {
+        "year": 2344,
+        "text": "USS Enterprise-C sacrifices itself defending the colony; Captain Garrett killed; crew captured by Romulans"
+      },
+      {
+        "year": 2366,
+        "text": "Enterprise-C emerges through a temporal rift into the present"
+      }
+    ],
+    "characters": [
+      "Rachel Garrett (Captain, Enterprise-C)",
+      "Tasha Yar (alternate)"
+    ],
+    "shows": [
+      "TNG"
+    ]
+  },
+  "Praxis": {
+    "id": "praxis",
+    "subtitle": "Moon of Qo'noS",
+    "x": 1610,
+    "y": 700,
+    "faction": "klingon",
+    "size": "minor",
+    "classification": "Destroyed (former Class H moon)",
+    "quadrant": "Beta",
+    "sector": "Sector 70505",
+    "coordinates": "+117 / −3 / +22",
+    "population": "None (destroyed)",
+    "memAlpha": "Praxis",
+    "desc": "The primary energy production facility of the Klingon Empire. Its catastrophic explosion in 2293 — caused by overmining and insufficient safety measures — mortally wounded the Klingon economy and forced Chancellor Gorkon to seek peace with the Federation.",
+    "events": [
+      {
+        "year": 2293,
+        "text": "Praxis explodes; debris cloud threatens Qo'noS atmosphere; Klingon Empire forced to seek peace"
+      }
+    ],
+    "characters": [
+      "Gorkon",
+      "Azetbur",
+      "General Chang"
+    ],
+    "shows": [
+      "TOS Films"
+    ]
+  },
+  "Romulus": {
+    "id": "romulus",
+    "subtitle": "Eisn (128 Trianguli) · destroyed 2387",
+    "x": 1490,
+    "y": 305,
+    "faction": "romulan",
+    "size": "capital",
+    "classification": "Class M (destroyed)",
+    "quadrant": "Beta",
+    "sector": "Sector Z-6",
+    "coordinates": "+128 / +44 / −18",
+    "population": "Billions killed; survivors scattered",
+    "memAlpha": "Romulus",
+    "desc": "The Romulan homeworld for two millennia. A green-hued Class M world orbiting the star Eisn. Destroyed in 2387 when the Hobus star went supernova. Spock's failure to prevent the destruction with red matter triggered a temporal incident creating the Kelvin timeline.",
+    "events": [
+      {
+        "year": "Unknown",
+        "text": "Romulan Star Empire founded by exiles from Vulcan following the Sundering"
+      },
+      {
+        "year": 2160,
+        "text": "Earth-Romulan War ends; Romulan Neutral Zone established without direct communication"
+      },
+      {
+        "year": 2387,
+        "text": "Hobus supernova destroys Romulus; billions die; Romulan diaspora begins"
+      },
+      {
+        "year": 2399,
+        "text": "Romulan Free State and Romulan Reclamation Site established near the Artifact"
+      }
+    ],
+    "characters": [
+      "Tomalak",
+      "Sela",
+      "Donatra",
+      "Pardek",
+      "Shinzon",
+      "Nero",
+      "Laris",
+      "Zhaban"
+    ],
+    "shows": [
+      "TOS",
+      "TNG",
+      "DS9",
+      "PIC",
+      "SNW"
+    ]
+  },
+  "Remus": {
+    "id": "remus",
+    "subtitle": "Twin world of Romulus · Eisn system",
+    "x": 1530,
+    "y": 330,
+    "faction": "romulan",
+    "size": "minor",
+    "classification": "Class M (partially habitable)",
+    "quadrant": "Beta",
+    "sector": "Sector Z-6",
+    "coordinates": "+128 / +44 / −18",
+    "population": "Remans (enslaved population, numbers unknown)",
+    "memAlpha": "Remus",
+    "desc": "The tidally locked sister world of Romulus, one hemisphere scorched by Eisn, the other in permanent darkness. Home to the Remans — a subjugated species used as slave labour in dilithium mines and shock troops in battle. Their connection to the Romulan people remains mysterious.",
+    "events": [
+      {
+        "year": 2379,
+        "text": "Shinzon, half-Romulan Reman, seizes the Romulan Senate and attempts to destroy Earth"
+      }
+    ],
+    "characters": [
+      "Shinzon",
+      "Vkruk (Reman Viceroy)"
+    ],
+    "shows": [
+      "TNG Films"
+    ]
+  },
+  "Cardassia Prime": {
+    "id": "cardassia",
+    "subtitle": "Cardassian system",
+    "x": 825,
+    "y": 980,
+    "faction": "cardassian",
+    "size": "capital",
+    "classification": "Class M (recovering)",
+    "quadrant": "Alpha",
+    "sector": "Sector 21305",
+    "coordinates": "−82 / +4 / −14",
+    "population": "Reduced to ~800 million after the war; formerly ~5 billion",
+    "memAlpha": "Cardassia_Prime",
+    "desc": "The Cardassian homeworld, a once-proud civilisation brought to near-extinction. In the final hours of the Dominion War, the Founders ordered Jem'Hadar troops to massacre the civilian population after the Cardassian fleet turned against the Dominion. The Cardassian Restoration began in 2376.",
+    "events": [
+      {
+        "year": 2328,
+        "text": "Cardassian occupation of Bajor begins — lasting 50 years of brutal rule"
+      },
+      {
+        "year": 2369,
+        "text": "Cardassians withdraw from Bajor; Terok Nor handed to the Federation"
+      },
+      {
+        "year": 2373,
+        "text": "Cardassia joins the Dominion; Cardassian fleet and industry placed under Jem'Hadar control"
+      },
+      {
+        "year": 2375,
+        "text": "Dominion massacres 800 million Cardassian civilians in the final battle; war ends"
+      }
+    ],
+    "characters": [
+      "Gul Dukat",
+      "Garak",
+      "Legate Damar",
+      "Kira Nerys (occupier perspective)",
+      "Gul Madred"
+    ],
+    "shows": [
+      "TNG",
+      "DS9"
+    ]
+  },
+  "Bajor": {
+    "id": "bajor",
+    "subtitle": "Bajoran system · Denorios Belt nearby",
+    "x": 970,
+    "y": 895,
+    "faction": "independent",
+    "size": "major",
+    "classification": "Class M",
+    "quadrant": "Alpha",
+    "sector": "Bajor sector",
+    "coordinates": "−86 / +4 / −16",
+    "population": "~1 billion",
+    "memAlpha": "Bajor",
+    "desc": "A deeply spiritual world whose people endured 50 years of brutal Cardassian occupation. The Bajoran people's faith in the Prophets — wormhole aliens worshipped as gods — sustained them through centuries of hardship. The stable Bajoran wormhole nearby leads to the Gamma Quadrant.",
+    "events": [
+      {
+        "year": 2319,
+        "text": "Cardassian occupation of Bajor begins; Bajoran Resistance forms"
+      },
+      {
+        "year": 2369,
+        "text": "Cardassians withdraw; Benjamin Sisko arrives and discovers the wormhole"
+      },
+      {
+        "year": 2369,
+        "text": "The Celestial Temple (stable wormhole) discovered; the Emissary revealed"
+      },
+      {
+        "year": 2375,
+        "text": "Bajor freed at the end of the Dominion War; application to join the Federation"
+      }
+    ],
+    "characters": [
+      "Kira Nerys",
+      "Kai Opaka",
+      "Kai Winn",
+      "Vedek Bareil",
+      "Li Nalas"
+    ],
+    "shows": [
+      "TNG",
+      "DS9"
+    ]
+  },
+  "Terok Nor": {
+    "id": "ds9",
+    "subtitle": "Deep Space Nine · DS9 · Bajor sector",
+    "x": 1005,
+    "y": 870,
+    "faction": "independent",
+    "size": "major",
+    "classification": "Cardassian space station (Nor-class)",
+    "quadrant": "Alpha",
+    "sector": "Bajor sector",
+    "coordinates": "−86 / +4 / −16",
+    "population": "~7,000 (mixed species)",
+    "memAlpha": "Deep_Space_9",
+    "desc": "The former Cardassian ore-processing station, now the Federation outpost Deep Space Nine. Positioned at the mouth of the only known stable wormhole in the galaxy — the Bajoran Wormhole to the Gamma Quadrant — it is the single most strategically important installation in the quadrant.",
+    "events": [
+      {
+        "year": 2351,
+        "text": "Terok Nor construction completed under Gul Dukat"
+      },
+      {
+        "year": 2369,
+        "text": "Cardassians withdraw; station renamed Deep Space Nine under Commander Sisko"
+      },
+      {
+        "year": 2373,
+        "text": "Dominion ships flood through the wormhole; Sisko mines the entrance and withdraws"
+      },
+      {
+        "year": 2375,
+        "text": "Sisko returns as the Emissary; station liberated at end of the Dominion War"
+      }
+    ],
+    "characters": [
+      "Benjamin Sisko",
+      "Kira Nerys",
+      "Jadzia Dax",
+      "Odo",
+      "Miles O'Brien",
+      "Quark",
+      "Julian Bashir",
+      "Jake Sisko",
+      "Worf"
+    ],
+    "shows": [
+      "DS9",
+      "PIC"
+    ]
+  },
+  "Ferenginar": {
+    "id": "ferenginar",
+    "subtitle": "Ferengi home system",
+    "x": 655,
+    "y": 520,
+    "faction": "ferengi",
+    "size": "capital",
+    "classification": "Class M (perpetually rainy)",
+    "quadrant": "Alpha",
+    "sector": "Sector 0522",
+    "coordinates": "−92 / +8 / +12",
+    "population": "~6 billion",
+    "memAlpha": "Ferenginar",
+    "desc": "The perpetually rain-soaked homeworld of the Ferengi. Commerce, profit, and the 285 Rules of Acquisition govern all aspects of Ferengi life. The Grand Nagus rules from the Tower of Commerce. Under Nagus Rom, Ferengi society began progressive reforms including female rights.",
+    "events": [
+      {
+        "year": 2375,
+        "text": "Grand Nagus Zek retires; Rom appointed Grand Nagus, beginning major social reforms"
+      }
+    ],
+    "characters": [
+      "Quark",
+      "Rom",
+      "Nog",
+      "Zek",
+      "Brunt (FCA)",
+      "Ishka (Moogie)"
+    ],
+    "shows": [
+      "TNG",
+      "DS9",
+      "ENT"
+    ]
+  },
+  "Breen": {
+    "id": "breen_hw",
+    "subtitle": "Breen homeworld · Breen Confederacy",
+    "x": 855,
+    "y": 1155,
+    "faction": "breen",
+    "size": "capital",
+    "classification": "Unknown (possibly not frozen)",
+    "quadrant": "Alpha",
+    "sector": "Unknown",
+    "coordinates": "Unknown",
+    "population": "Unknown (secretive)",
+    "memAlpha": "Breen_homeworld",
+    "desc": "The enigmatic homeworld of the Breen Confederacy. Contrary to Federation intelligence for centuries, Breen is not a frozen world — though the Breen themselves perpetuate this myth. The Breen wear refrigeration suits at all times and their biology remains classified.",
+    "events": [
+      {
+        "year": 2375,
+        "text": "Breen join the Dominion; crippling energy weapon devastates Federation-Klingon fleet"
+      },
+      {
+        "year": 2375,
+        "text": "Breen attack on Starfleet Headquarters in San Francisco — first attack on Earth since 2153"
+      },
+      {
+        "year": 2375,
+        "text": "Energy dampening weapon countered; Breen forces defeated at Cardassia Prime"
+      }
+    ],
+    "characters": [
+      "Thot Gor",
+      "Thot Pran",
+      "Kira Nerys (imprisoned here briefly)"
+    ],
+    "shows": [
+      "DS9"
+    ]
+  },
+  "Organia": {
+    "id": "organia",
+    "subtitle": "Organian system",
+    "x": 1290,
+    "y": 690,
+    "faction": "independent",
+    "size": "minor",
+    "classification": "Class M (apparent)",
+    "quadrant": "Beta",
+    "sector": "Sector 3",
+    "coordinates": "+96 / −1 / +19",
+    "population": "~1,000 (apparent); true nature unknown",
+    "memAlpha": "Organia",
+    "desc": "Apparent primitive pre-industrial world that reveals itself to be home to enormously powerful non-corporeal beings — the Organians. They forced an end to an imminent Federation-Klingon war and imposed the Organian Peace Treaty of 2267.",
+    "events": [
+      {
+        "year": 2267,
+        "text": "Organian Peace Treaty imposed on both the Federation and Klingon Empire"
+      }
+    ],
+    "characters": [
+      "Ayelborne (Organian Elder)",
+      "Claymare"
+    ],
+    "shows": [
+      "TOS"
+    ]
+  },
+  "Veridian III": {
+    "id": "veridian3",
+    "subtitle": "Veridian system",
+    "x": 1150,
+    "y": 600,
+    "faction": "independent",
+    "size": "minor",
+    "classification": "Class M",
+    "quadrant": "Beta",
+    "sector": "Veridian system",
+    "coordinates": "+91 / +18 / +3",
+    "population": "None (pre-warp civilisation on Veridian IV nearby)",
+    "memAlpha": "Veridian_III",
+    "desc": "Site of the final battle between the USS Enterprise-B and Duras sisters, and the location where Captain James T. Kirk died helping Picard defeat Dr. Tolian Soran. Soran intended to destroy the star here to redirect the Nexus energy ribbon.",
+    "events": [
+      {
+        "year": 2371,
+        "text": "Captain Kirk dies on Veridian III helping Captain Picard stop Soran's trilithium weapon"
+      }
+    ],
+    "characters": [
+      "James T. Kirk (dies here)",
+      "Jean-Luc Picard",
+      "Tolian Soran",
+      "Lursa",
+      "B'Etor"
+    ],
+    "shows": [
+      "TNG Films"
+    ]
+  }
+}

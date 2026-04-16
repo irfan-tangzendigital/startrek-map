@@ -1,0 +1,11 @@
+[
+  { "id": "federation",  "name": "United Federation of Planets", "short": "UFP", "color": "3377FF", "css": "#3377FF" },
+  { "id": "klingon",     "name": "Klingon Empire",              "short": "KE",  "color": "CC2200", "css": "#CC2200" },
+  { "id": "romulan",     "name": "Romulan Star Empire",         "short": "RSE", "color": "229933", "css": "#229933" },
+  { "id": "cardassian",  "name": "Cardassian Union",            "short": "CU",  "color": "CC6600", "css": "#CC6600" },
+  { "id": "ferengi",     "name": "Ferengi Alliance",            "short": "FA",  "color": "BB9900", "css": "#BB9900" },
+  { "id": "breen",       "name": "Breen Confederacy",           "short": "BC",  "color": "2266AA", "css": "#2266AA" },
+  { "id": "dominion",    "name": "Dominion",                    "short": "DOM", "color": "996633", "css": "#996633" },
+  { "id": "independent", "name": "Independent / Neutral",       "short": "IND", "color": "778866", "css": "#778866" }
+]
+

@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Star Trek Stellar Cartography</title>
+
+    <!-- Antonio = closest free match to the real LCARS font (confirmed by thelcars.com)
+         Share Tech Mono = data readouts + coordinates -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;700&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <div id="ui">
+      <div class="corner" id="c-tl"></div>
+      <div class="corner" id="c-br"></div>
+
+      <!-- Search -->
+      <div id="search-panel" class="panel">
+        <div class="panel-header">Stellar Cartography</div>
+        <div class="panel-body">
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Search systems, sectors..."
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <div id="search-results"></div>
+        </div>
+      </div>
+
+      <!-- Faction filters -->
+      <div id="faction-panel" class="panel">
+        <div class="panel-header">Factions</div>
+        <div id="faction-list" style="padding: 6px 0"></div>
+      </div>
+
+      <!-- Info panel (full-height slide-in) -->
+      <div id="info-panel">
+        <div id="info-faction-bar"></div>
+        <button id="info-close" type="button">✕</button>
+        <div id="info-header">
+          <div id="info-faction-tag"></div>
+          <div id="info-name"></div>
+          <div id="info-subtitle"></div>
+        </div>
+        <div id="info-stats"></div>
+        <div id="info-body">
+          <div class="info-section">
+            <div class="info-section-label">Overview</div>
+            <div id="info-desc"></div>
+          </div>
+          <div class="info-section" id="events-section" style="display: none">
+            <div class="info-section-label">Key Events</div>
+            <div id="info-events"></div>
+          </div>
+          <div class="info-section" id="chars-section" style="display: none">
+            <div class="info-section-label">Notable Personnel</div>
+            <div id="info-chars" class="char-grid"></div>
+          </div>
+          <div class="info-section">
+            <div class="info-section-label">Series Appearances</div>
+            <div id="info-shows" class="shows-row"></div>
+          </div>
+          <div class="info-section">
+            <div class="info-section-label">External Reference</div>
+            <a id="info-malpha" href="#" target="_blank" rel="noopener"> ▶ &nbsp;VIEW ON MEMORY ALPHA </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div id="controls">
+        <button class="ctrl-btn" id="btn-zoom-in" type="button">+</button>
+        <span id="zoom-label">—</span>
+        <button class="ctrl-btn" id="btn-zoom-out" type="button">−</button>
+        <button class="ctrl-btn" id="reset-btn" type="button">RESET</button>
+      </div>
+
+      <div id="coords">SECTOR 000-000</div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
