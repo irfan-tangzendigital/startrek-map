@@ -5,11 +5,40 @@ const DEFAULT_WORLD_H = 1600;
 
 const RADII = { capital: 8, major: 5, minor: 3.5 };
 
+const FACTION_BLOBS = [
+  // Federation — centre Alpha
+  { faction: 'federation', x: 900, y: 500, r: 320, alpha: 0.1 },
+  { faction: 'federation', x: 820, y: 600, r: 250, alpha: 0.08 },
+  { faction: 'federation', x: 980, y: 450, r: 200, alpha: 0.07 },
+  { faction: 'federation', x: 1050, y: 580, r: 180, alpha: 0.06 },
+  // Klingon — mid Beta
+  { faction: 'klingon', x: 1600, y: 620, r: 300, alpha: 0.1 },
+  { faction: 'klingon', x: 1750, y: 500, r: 240, alpha: 0.08 },
+  { faction: 'klingon', x: 1680, y: 750, r: 200, alpha: 0.07 },
+  { faction: 'klingon', x: 1500, y: 680, r: 180, alpha: 0.06 },
+  // Romulan — upper Beta
+  { faction: 'romulan', x: 1500, y: 250, r: 280, alpha: 0.1 },
+  { faction: 'romulan', x: 1650, y: 180, r: 220, alpha: 0.08 },
+  { faction: 'romulan', x: 1380, y: 320, r: 180, alpha: 0.07 },
+  // Cardassian — lower-left Alpha
+  { faction: 'cardassian', x: 700, y: 880, r: 260, alpha: 0.1 },
+  { faction: 'cardassian', x: 600, y: 980, r: 200, alpha: 0.08 },
+  { faction: 'cardassian', x: 800, y: 950, r: 170, alpha: 0.07 },
+  // Ferengi — upper-left Alpha
+  { faction: 'ferengi', x: 480, y: 450, r: 220, alpha: 0.1 },
+  { faction: 'ferengi', x: 380, y: 520, r: 170, alpha: 0.08 },
+  // Breen — lower Alpha
+  { faction: 'breen', x: 720, y: 1150, r: 220, alpha: 0.1 },
+  { faction: 'breen', x: 620, y: 1250, r: 170, alpha: 0.08 },
+  // Dominion — lower centre
+  { faction: 'dominion', x: 800, y: 1050, r: 190, alpha: 0.09 },
+  { faction: 'dominion', x: 700, y: 1150, r: 150, alpha: 0.07 },
+];
+
 export function createMap({
   mountEl,
   factions,
   systems,
-  territories,
   worldWidth = DEFAULT_WORLD_W,
   worldHeight = DEFAULT_WORLD_H,
   onSelectionChange,
@@ -81,7 +110,7 @@ export function createMap({
     worldWidth,
     worldHeight,
   });
-  drawTerritories({ overlayLayer, territories, factions });
+  drawTerritories({ overlayLayer, factions });
   drawSystems({
     sysLayer,
     lblLayer,
@@ -340,35 +369,39 @@ function drawBackground({ bgLayer, starsFar, starsMid, worldWidth, worldHeight }
   bgLayer.addChild(starsNear);
 }
 
-function drawTerritories({ overlayLayer, territories, factions }) {
-  if (!territories?.length) return;
-  territories.forEach((t) => {
-    const f = factions[t.faction];
+function drawTerritories({ overlayLayer, factions }) {
+  const g = new PIXI.Graphics();
+  FACTION_BLOBS.forEach((blob) => {
+    const f = factions[blob.faction];
     if (!f) return;
+    g.beginFill(f.color, blob.alpha).drawCircle(blob.x, blob.y, blob.r).endFill();
+  });
+  overlayLayer.addChild(g);
 
-    const pts = t.points;
-    let cx = 0;
-    let cy = 0;
-    for (let i = 0; i < pts.length; i += 2) {
-      cx += pts[i];
-      cy += pts[i + 1];
-    }
-    cx /= pts.length / 2;
-    cy /= pts.length / 2;
+  const centroids = {};
+  FACTION_BLOBS.forEach((blob) => {
+    if (!centroids[blob.faction]) centroids[blob.faction] = { x: 0, y: 0, n: 0 };
+    centroids[blob.faction].x += blob.x;
+    centroids[blob.faction].y += blob.y;
+    centroids[blob.faction].n += 1;
+  });
+  Object.entries(centroids).forEach(([factionKey, c]) => {
+    const f = factions[factionKey];
+    if (!f) return;
     const lbl = new PIXI.Text(
       f.short,
       new PIXI.TextStyle({
         fontFamily: 'Antonio,Courier New',
-        fontSize: 25,
-        fill: 0xffffff,
+        fontSize: 22,
+        fill: f.color,
         letterSpacing: 5,
         fontWeight: '700',
       }),
     );
     lbl.anchor.set(0.5);
-    lbl.x = cx;
-    lbl.y = cy;
-    lbl.alpha = 0.2;
+    lbl.x = c.x / c.n;
+    lbl.y = c.y / c.n;
+    lbl.alpha = 0.18;
     overlayLayer.addChild(lbl);
   });
 }
