@@ -35,13 +35,17 @@ export function createMap({
   app.view.id = 'map-canvas';
 
   const world = new PIXI.Container();
-  app.stage.addChild(world);
+  const starsFar = new PIXI.Container();
+  const starsMid = new PIXI.Container();
   const bgLayer = new PIXI.Container();
   const overlayLayer = new PIXI.Container();
   const glowLayer = new PIXI.Container();
   const sysLayer = new PIXI.Container();
   const lblLayer = new PIXI.Container();
   world.addChild(bgLayer, overlayLayer, glowLayer, sysLayer, lblLayer);
+
+  /** Parallax layers (screen space); behind `world` in z-order */
+  app.stage.addChild(starsFar, starsMid, world);
 
   function applyWorldPerspective() {
     world.skew.x = -0.08;
@@ -53,13 +57,27 @@ export function createMap({
   world.x = (app.screen.width - worldWidth * initialScale) / 2;
   world.y = (app.screen.height - worldHeight * initialScale) / 2;
 
+  function syncParallaxStars() {
+    starsFar.scale.set(world.scale.x, world.scale.y);
+    starsFar.skew.x = world.skew.x;
+    starsFar.skew.y = world.skew.y;
+    starsFar.position.set(world.x * 0.4, world.y * 0.4);
+    starsMid.scale.set(world.scale.x, world.scale.y);
+    starsMid.skew.x = world.skew.x;
+    starsMid.skew.y = world.skew.y;
+    starsMid.position.set(world.x * 0.7, world.y * 0.7);
+  }
+  syncParallaxStars();
+
   const sysMap = {};
   const activeFactions = new Set(Object.keys(factions));
   let selectedSystem = null;
   let glowGfx = null;
 
-  const { starsFar, starsMid, starsNear } = drawBackground({
+  drawBackground({
     bgLayer,
+    starsFar,
+    starsMid,
     worldWidth,
     worldHeight,
   });
@@ -84,7 +102,12 @@ export function createMap({
   app.render();
 
   // Pan + zoom
-  const ZOOM_MIN = 0.12;
+  function computeZoomMin() {
+    return (
+      Math.min(window.innerWidth / worldWidth, window.innerHeight / worldHeight) * 0.85
+    );
+  }
+  let zoomMin = computeZoomMin();
   const ZOOM_MAX = 4.5;
   let isDragging = false;
   let dragStart = { x: 0, y: 0 };
@@ -97,8 +120,6 @@ export function createMap({
     isDragging = true;
     dragStart = { x: e.global.x, y: e.global.y };
     worldStart = { x: world.x, y: world.y };
-    starsFar.position.set(0, 0);
-    starsMid.position.set(0, 0);
     app.view.classList.add('dragging');
   });
 
@@ -113,10 +134,7 @@ export function createMap({
     const dy = e.global.y - dragStart.y;
     world.x = worldStart.x + dx;
     world.y = worldStart.y + dy;
-    starsFar.x = worldStart.x + dx * 0.6 - world.x;
-    starsFar.y = worldStart.y + dy * 0.6 - world.y;
-    starsMid.x = worldStart.x + dx * 0.8 - world.x;
-    starsMid.y = worldStart.y + dy * 0.8 - world.y;
+    syncParallaxStars();
   });
 
   const endDrag = () => {
@@ -136,12 +154,13 @@ export function createMap({
   );
 
   function zoomAt(mx, my, factor) {
-    const nextScale = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, world.scale.x * factor));
+    const nextScale = Math.min(ZOOM_MAX, Math.max(zoomMin, world.scale.x * factor));
     const ratio = nextScale / world.scale.x;
     world.x = mx + (world.x - mx) * ratio;
     world.y = my + (world.y - my) * ratio;
     world.scale.set(nextScale);
     applyWorldPerspective();
+    syncParallaxStars();
     onZoom();
   }
 
@@ -155,8 +174,7 @@ export function createMap({
     applyWorldPerspective();
     world.x = (app.screen.width - worldWidth * initialScale) / 2;
     world.y = (app.screen.height - worldHeight * initialScale) / 2;
-    starsFar.position.set(0, 0);
-    starsMid.position.set(0, 0);
+    syncParallaxStars();
     onZoom();
   }
 
@@ -228,8 +246,6 @@ export function createMap({
   function flyTo(sys, zoom = 1.8) {
     const ref = sysMap[sys.id];
     if (!ref) return;
-    starsFar.position.set(0, 0);
-    starsMid.position.set(0, 0);
     const x0 = world.x;
     const y0 = world.y;
     const z0 = world.scale.x;
@@ -244,6 +260,7 @@ export function createMap({
       world.y = y0 + (y1 - y0) * p;
       world.scale.set(z0 + (zoom - z0) * p);
       applyWorldPerspective();
+      syncParallaxStars();
       onZoom();
       if (t >= 1) {
         app.ticker.remove(tick);
@@ -257,6 +274,12 @@ export function createMap({
   window.addEventListener('resize', () => {
     app.renderer.resize(window.innerWidth, window.innerHeight);
     app.stage.hitArea = app.screen;
+    zoomMin = computeZoomMin();
+    if (world.scale.x < zoomMin) {
+      world.scale.set(zoomMin);
+      applyWorldPerspective();
+    }
+    syncParallaxStars();
   });
 
   return {
@@ -283,36 +306,38 @@ function mulberry32(seed) {
   };
 }
 
+/** Star field over 3× world extent: x ∈ [-W, 2W], y ∈ [-H, 2H] */
 function drawStarsInGraphics(gfx, count, radius, alpha, seed, worldWidth, worldHeight) {
   const rng = mulberry32(seed);
+  const spanW = worldWidth * 3;
+  const spanH = worldHeight * 3;
+  const x0 = -worldWidth;
+  const y0 = -worldHeight;
   for (let i = 0; i < count; i++) {
-    const x = rng() * worldWidth;
-    const y = rng() * worldHeight;
+    const x = x0 + rng() * spanW;
+    const y = y0 + rng() * spanH;
     const blueWhite = rng() < 0.12;
     const color = blueWhite ? 0xaabbff : 0xffffff;
     gfx.beginFill(color, alpha).drawCircle(x, y, radius).endFill();
   }
 }
 
-function drawBackground({ bgLayer, worldWidth, worldHeight }) {
-  const starsFar = new PIXI.Container();
-  const starsMid = new PIXI.Container();
+function drawBackground({ bgLayer, starsFar, starsMid, worldWidth, worldHeight }) {
   const starsNear = new PIXI.Container();
 
   const gfxFar = new PIXI.Graphics();
-  drawStarsInGraphics(gfxFar, 3000, 0.4, 0.15, 111, worldWidth, worldHeight);
+  drawStarsInGraphics(gfxFar, 12000, 0.4, 0.15, 111, worldWidth, worldHeight);
   starsFar.addChild(gfxFar);
 
   const gfxMid = new PIXI.Graphics();
-  drawStarsInGraphics(gfxMid, 1500, 0.8, 0.35, 222, worldWidth, worldHeight);
+  drawStarsInGraphics(gfxMid, 6000, 0.8, 0.35, 222, worldWidth, worldHeight);
   starsMid.addChild(gfxMid);
 
   const gfxNear = new PIXI.Graphics();
-  drawStarsInGraphics(gfxNear, 400, 1.4, 0.7, 333, worldWidth, worldHeight);
+  drawStarsInGraphics(gfxNear, 1600, 1.4, 0.7, 333, worldWidth, worldHeight);
   starsNear.addChild(gfxNear);
 
-  bgLayer.addChild(starsFar, starsMid, starsNear);
-  return { starsFar, starsMid, starsNear };
+  bgLayer.addChild(starsNear);
 }
 
 function drawTerritories({ overlayLayer, territories, factions }) {
