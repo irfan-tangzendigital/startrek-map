@@ -269,7 +269,7 @@ function drawBackground({ bgLayer, worldWidth, worldHeight }) {
 
   const qs = new PIXI.TextStyle({
     fontFamily: 'Antonio,Courier New',
-    fontSize: 46,
+    fontSize: 53,
     fill: 0xffffff,
     letterSpacing: 10,
     fontWeight: '700',
@@ -310,7 +310,7 @@ function drawTerritories({ overlayLayer, territories, factions }) {
       f.short,
       new PIXI.TextStyle({
         fontFamily: 'Antonio,Courier New',
-        fontSize: 22,
+        fontSize: 25,
         fill: f.color,
         letterSpacing: 5,
         fontWeight: '700',
@@ -360,7 +360,7 @@ function drawSystems({
       sys.name,
       new PIXI.TextStyle({
         fontFamily: 'Antonio,Courier New',
-        fontSize: 10,
+        fontSize: 12,
         fill: factions[sys.faction]?.color ?? 0xffffff,
         letterSpacing: 1.4,
       }),
