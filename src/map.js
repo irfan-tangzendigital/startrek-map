@@ -43,7 +43,13 @@ export function createMap({
   const lblLayer = new PIXI.Container();
   world.addChild(bgLayer, overlayLayer, glowLayer, sysLayer, lblLayer);
 
+  function applyWorldPerspective() {
+    world.skew.x = -0.08;
+    world.scale.y = world.scale.x * 0.72;
+  }
+
   world.scale.set(initialScale);
+  applyWorldPerspective();
   world.x = (app.screen.width - worldWidth * initialScale) / 2;
   world.y = (app.screen.height - worldHeight * initialScale) / 2;
 
@@ -52,7 +58,11 @@ export function createMap({
   let selectedSystem = null;
   let glowGfx = null;
 
-  drawBackground({ bgLayer, worldWidth, worldHeight });
+  const { starsFar, starsMid, starsNear } = drawBackground({
+    bgLayer,
+    worldWidth,
+    worldHeight,
+  });
   drawTerritories({ overlayLayer, territories, factions });
   drawSystems({
     sysLayer,
@@ -87,6 +97,8 @@ export function createMap({
     isDragging = true;
     dragStart = { x: e.global.x, y: e.global.y };
     worldStart = { x: world.x, y: world.y };
+    starsFar.position.set(0, 0);
+    starsMid.position.set(0, 0);
     app.view.classList.add('dragging');
   });
 
@@ -97,8 +109,14 @@ export function createMap({
       onCoordsChange({ wx, wy });
     }
     if (!isDragging) return;
-    world.x = worldStart.x + (e.global.x - dragStart.x);
-    world.y = worldStart.y + (e.global.y - dragStart.y);
+    const dx = e.global.x - dragStart.x;
+    const dy = e.global.y - dragStart.y;
+    world.x = worldStart.x + dx;
+    world.y = worldStart.y + dy;
+    starsFar.x = worldStart.x + dx * 0.6 - world.x;
+    starsFar.y = worldStart.y + dy * 0.6 - world.y;
+    starsMid.x = worldStart.x + dx * 0.8 - world.x;
+    starsMid.y = worldStart.y + dy * 0.8 - world.y;
   });
 
   const endDrag = () => {
@@ -123,6 +141,7 @@ export function createMap({
     world.x = mx + (world.x - mx) * ratio;
     world.y = my + (world.y - my) * ratio;
     world.scale.set(nextScale);
+    applyWorldPerspective();
     onZoom();
   }
 
@@ -133,8 +152,11 @@ export function createMap({
 
   function resetView() {
     world.scale.set(initialScale);
+    applyWorldPerspective();
     world.x = (app.screen.width - worldWidth * initialScale) / 2;
     world.y = (app.screen.height - worldHeight * initialScale) / 2;
+    starsFar.position.set(0, 0);
+    starsMid.position.set(0, 0);
     onZoom();
   }
 
@@ -206,6 +228,8 @@ export function createMap({
   function flyTo(sys, zoom = 1.8) {
     const ref = sysMap[sys.id];
     if (!ref) return;
+    starsFar.position.set(0, 0);
+    starsMid.position.set(0, 0);
     const x0 = world.x;
     const y0 = world.y;
     const z0 = world.scale.x;
@@ -219,6 +243,7 @@ export function createMap({
       world.x = x0 + (x1 - x0) * p;
       world.y = y0 + (y1 - y0) * p;
       world.scale.set(z0 + (zoom - z0) * p);
+      applyWorldPerspective();
       onZoom();
       if (t >= 1) {
         app.ticker.remove(tick);
@@ -247,25 +272,47 @@ export function createMap({
   };
 }
 
-function drawBackground({ bgLayer, worldWidth, worldHeight }) {
-  const bg = PIXI.Sprite.from('/shakaar_map.jpg');
-  bg.width = worldWidth;
-  bg.height = worldHeight;
-  bgLayer.addChildAt(bg, 0);
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function next() {
+    a += 0x6d2b79f5;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
-  const credit = new PIXI.Text(
-    "© Shakaar's Alpha/Beta Map v3.3",
-    new PIXI.TextStyle({
-      fontFamily: 'Antonio,Courier New',
-      fontSize: 10,
-      fill: 0xffffff,
-    }),
-  );
-  credit.alpha = 0.35;
-  credit.anchor.set(1, 1);
-  credit.x = worldWidth - 10;
-  credit.y = worldHeight - 10;
-  bgLayer.addChild(credit);
+function drawStarsInGraphics(gfx, count, radius, alpha, seed, worldWidth, worldHeight) {
+  const rng = mulberry32(seed);
+  for (let i = 0; i < count; i++) {
+    const x = rng() * worldWidth;
+    const y = rng() * worldHeight;
+    const blueWhite = rng() < 0.12;
+    const color = blueWhite ? 0xaabbff : 0xffffff;
+    gfx.beginFill(color, alpha).drawCircle(x, y, radius).endFill();
+  }
+}
+
+function drawBackground({ bgLayer, worldWidth, worldHeight }) {
+  const starsFar = new PIXI.Container();
+  const starsMid = new PIXI.Container();
+  const starsNear = new PIXI.Container();
+
+  const gfxFar = new PIXI.Graphics();
+  drawStarsInGraphics(gfxFar, 3000, 0.4, 0.15, 111, worldWidth, worldHeight);
+  starsFar.addChild(gfxFar);
+
+  const gfxMid = new PIXI.Graphics();
+  drawStarsInGraphics(gfxMid, 1500, 0.8, 0.35, 222, worldWidth, worldHeight);
+  starsMid.addChild(gfxMid);
+
+  const gfxNear = new PIXI.Graphics();
+  drawStarsInGraphics(gfxNear, 400, 1.4, 0.7, 333, worldWidth, worldHeight);
+  starsNear.addChild(gfxNear);
+
+  bgLayer.addChild(starsFar, starsMid, starsNear);
+  return { starsFar, starsMid, starsNear };
 }
 
 function drawTerritories({ overlayLayer, territories, factions }) {
