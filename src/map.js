@@ -5,35 +5,35 @@ const DEFAULT_WORLD_H = 1600;
 
 const RADII = { capital: 8, major: 5, minor: 3.5 };
 
-/** r and alpha scaled −30% / −40% from original art; drawn as 3 radial passes each */
+/** Ambient nebula-style blobs; drawn as 3 radial passes each */
 const FACTION_BLOBS = [
   // Federation — centre Alpha
-  { faction: 'federation', x: 900, y: 500, r: 224, alpha: 0.06 },
-  { faction: 'federation', x: 820, y: 600, r: 175, alpha: 0.048 },
-  { faction: 'federation', x: 980, y: 450, r: 140, alpha: 0.042 },
-  { faction: 'federation', x: 1050, y: 580, r: 126, alpha: 0.036 },
+  { faction: 'federation', x: 950, y: 560, r: 210, alpha: 0.038 },
+  { faction: 'federation', x: 860, y: 650, r: 165, alpha: 0.03 },
+  { faction: 'federation', x: 1040, y: 510, r: 140, alpha: 0.026 },
+  { faction: 'federation', x: 1000, y: 680, r: 125, alpha: 0.022 },
   // Klingon — mid Beta
-  { faction: 'klingon', x: 1600, y: 620, r: 210, alpha: 0.06 },
-  { faction: 'klingon', x: 1750, y: 500, r: 168, alpha: 0.048 },
-  { faction: 'klingon', x: 1680, y: 750, r: 140, alpha: 0.042 },
-  { faction: 'klingon', x: 1500, y: 680, r: 126, alpha: 0.036 },
+  { faction: 'klingon', x: 1620, y: 580, r: 200, alpha: 0.038 },
+  { faction: 'klingon', x: 1760, y: 460, r: 160, alpha: 0.03 },
+  { faction: 'klingon', x: 1690, y: 720, r: 135, alpha: 0.026 },
+  { faction: 'klingon', x: 1520, y: 650, r: 120, alpha: 0.022 },
   // Romulan — upper Beta
-  { faction: 'romulan', x: 1500, y: 250, r: 196, alpha: 0.06 },
-  { faction: 'romulan', x: 1650, y: 180, r: 154, alpha: 0.048 },
-  { faction: 'romulan', x: 1380, y: 320, r: 126, alpha: 0.042 },
-  // Cardassian — lower-left Alpha
-  { faction: 'cardassian', x: 700, y: 880, r: 182, alpha: 0.06 },
-  { faction: 'cardassian', x: 600, y: 980, r: 140, alpha: 0.048 },
-  { faction: 'cardassian', x: 800, y: 950, r: 119, alpha: 0.042 },
-  // Ferengi — upper-left Alpha
-  { faction: 'ferengi', x: 480, y: 450, r: 154, alpha: 0.06 },
-  { faction: 'ferengi', x: 380, y: 520, r: 119, alpha: 0.048 },
-  // Breen — lower Alpha
-  { faction: 'breen', x: 720, y: 1150, r: 154, alpha: 0.06 },
-  { faction: 'breen', x: 620, y: 1250, r: 119, alpha: 0.048 },
+  { faction: 'romulan', x: 1520, y: 200, r: 185, alpha: 0.038 },
+  { faction: 'romulan', x: 1680, y: 140, r: 145, alpha: 0.03 },
+  { faction: 'romulan', x: 1390, y: 280, r: 120, alpha: 0.026 },
+  // Cardassian — lower left Alpha
+  { faction: 'cardassian', x: 620, y: 920, r: 175, alpha: 0.038 },
+  { faction: 'cardassian', x: 520, y: 1020, r: 135, alpha: 0.03 },
+  { faction: 'cardassian', x: 720, y: 1000, r: 115, alpha: 0.026 },
+  // Ferengi — upper left Alpha
+  { faction: 'ferengi', x: 560, y: 380, r: 148, alpha: 0.038 },
+  { faction: 'ferengi', x: 460, y: 460, r: 115, alpha: 0.03 },
+  // Breen — lower centre Alpha
+  { faction: 'breen', x: 820, y: 1180, r: 148, alpha: 0.038 },
+  { faction: 'breen', x: 720, y: 1280, r: 115, alpha: 0.03 },
   // Dominion — lower centre
-  { faction: 'dominion', x: 800, y: 1050, r: 133, alpha: 0.054 },
-  { faction: 'dominion', x: 700, y: 1150, r: 105, alpha: 0.042 },
+  { faction: 'dominion', x: 920, y: 1080, r: 128, alpha: 0.034 },
+  { faction: 'dominion', x: 820, y: 1180, r: 100, alpha: 0.026 },
 ];
 
 export function createMap({
