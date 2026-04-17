@@ -127,18 +127,28 @@ function buildSearch({ map, factions, systems }) {
   const results = document.getElementById('search-results');
 
   input.addEventListener('input', () => {
+    console.log('[search] systems:', Array.isArray(systems), systems?.length);
     const q = input.value.trim().toLowerCase();
     results.innerHTML = '';
     if (!q) return;
 
     systems
-      .filter((s) => s.name.toLowerCase().includes(q) || s.subtitle.toLowerCase().includes(q))
+      .filter((s) => {
+        const normalised = (s.name || '').toLowerCase().replaceAll(' system', '');
+        const faction = (s.faction || '').toLowerCase();
+        return (
+          normalised.includes(q) ||
+          (s.subtitle || '').toLowerCase().includes(q) ||
+          (s.id || '').toLowerCase().includes(q) ||
+          faction.includes(q)
+        );
+      })
       .slice(0, 8)
       .forEach((sys) => {
         const el = document.createElement('div');
         el.className = 'search-result';
         el.innerHTML = `<div>${escapeHtml(sys.name)}</div><div class="search-result-sub">${escapeHtml(
-          factions[sys.faction].name,
+          factions[sys.faction]?.name ?? '',
         )}</div>`;
         el.addEventListener('click', () => {
           input.value = sys.name;
