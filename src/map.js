@@ -145,7 +145,7 @@ export function createMap({
     pulseT += dt * 0.03;
     Object.values(sysMap).forEach(({ dot, data }) => {
       if (data.size === 'capital') {
-        dot.alpha = 0.88 + Math.sin(pulseT) * 0.12;
+        dot.alpha = 0.75 + Math.sin(pulseT) * 0.25;
       }
     });
   });
@@ -284,7 +284,9 @@ export function createMap({
         return;
       }
       const dt = app.ticker.deltaMS / 1000;
-      g.rotation += dt * 0.004;
+      g.rotation += dt * 0.008;
+      const pulse = 1 + Math.sin(Date.now() * 0.002) * 0.06;
+      g.scale.set(pulse);
     };
     app.ticker.add(rotateReticle);
     return g;
@@ -526,14 +528,14 @@ function renderNode(g, sys, r, hover, factions) {
   g.clear();
 
   if (sys.size === 'capital') {
-    g.beginFill(color, hover ? 0.12 : 0.07).drawCircle(0, 0, r * 3.2).endFill();
-    g.beginFill(color, hover ? 0.28 : 0.18).drawCircle(0, 0, r * 1.8).endFill();
+    g.beginFill(color, hover ? 0.12 : 0.07).drawEllipse(0, 0, r * 3.2, (r * 3.2) / 0.72).endFill();
+    g.beginFill(color, hover ? 0.28 : 0.18).drawEllipse(0, 0, r * 1.8, (r * 1.8) / 0.72).endFill();
     g.beginFill(color, hover ? 1.0 : 0.92).drawCircle(0, 0, r).endFill();
     g.lineStyle(0.6, color, hover ? 0.7 : 0.4);
     g.drawEllipse(0, 0, r * 2.4, r * 0.9);
   } else if (sys.size === 'major') {
-    g.beginFill(color, hover ? 0.1 : 0.06).drawCircle(0, 0, r * 2.6).endFill();
-    g.beginFill(color, hover ? 0.25 : 0.15).drawCircle(0, 0, r * 1.6).endFill();
+    g.beginFill(color, hover ? 0.1 : 0.06).drawEllipse(0, 0, r * 2.6, (r * 2.6) / 0.72).endFill();
+    g.beginFill(color, hover ? 0.25 : 0.15).drawEllipse(0, 0, r * 1.6, (r * 1.6) / 0.72).endFill();
     g.beginFill(color, hover ? 1.0 : 0.88).drawCircle(0, 0, r).endFill();
   } else {
     // Minor — barely visible, only a faint pixel
