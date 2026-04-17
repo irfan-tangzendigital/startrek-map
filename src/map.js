@@ -5,6 +5,11 @@ const DEFAULT_WORLD_H = 1600;
 
 const RADII = { capital: 8, major: 5, minor: 3.5 };
 
+/** Mulberry seeds for star layers — reused for ±5% parallax variation */
+const STAR_SEED_VERY_FAR = 44;
+const STAR_SEED_FAR = 111;
+const STAR_SEED_MID = 222;
+
 /** Ambient nebula-style blobs; drawn as 3 radial passes each */
 const FACTION_BLOBS = [
   // Federation — centre Alpha
@@ -65,6 +70,7 @@ export function createMap({
   app.view.id = 'map-canvas';
 
   const world = new PIXI.Container();
+  const starsVeryFar = new PIXI.Container();
   const starsFar = new PIXI.Container();
   const starsMid = new PIXI.Container();
   const bgLayer = new PIXI.Container();
@@ -75,7 +81,7 @@ export function createMap({
   world.addChild(bgLayer, overlayLayer, glowLayer, sysLayer, lblLayer);
 
   /** Parallax layers (screen space); behind `world` in z-order */
-  app.stage.addChild(starsFar, starsMid, world);
+  app.stage.addChild(starsVeryFar, starsFar, starsMid, world);
 
   function applyWorldPerspective() {
     world.skew.x = -0.08;
@@ -88,14 +94,22 @@ export function createMap({
   world.y = (app.screen.height - worldHeight * initialScale) / 2;
 
   function syncParallaxStars() {
+    const parallaxFar = 0.38 + Math.sin(STAR_SEED_FAR) * 0.02;
+    const parallaxMid = 0.68 + Math.cos(STAR_SEED_MID) * 0.02;
+
+    starsVeryFar.scale.set(world.scale.x, world.scale.y);
+    starsVeryFar.skew.set(world.skew.x, world.skew.y);
+    starsVeryFar.position.set(world.x * 0.2, world.y * 0.2);
+
     starsFar.scale.set(world.scale.x, world.scale.y);
     starsFar.skew.x = world.skew.x;
     starsFar.skew.y = world.skew.y;
-    starsFar.position.set(world.x * 0.4, world.y * 0.4);
+    starsFar.position.set(world.x * parallaxFar, world.y * parallaxFar);
+
     starsMid.scale.set(world.scale.x, world.scale.y);
     starsMid.skew.x = world.skew.x;
     starsMid.skew.y = world.skew.y;
-    starsMid.position.set(world.x * 0.7, world.y * 0.7);
+    starsMid.position.set(world.x * parallaxMid, world.y * parallaxMid);
   }
   syncParallaxStars();
 
@@ -106,6 +120,7 @@ export function createMap({
 
   drawBackground({
     bgLayer,
+    starsVeryFar,
     starsFar,
     starsMid,
     worldWidth,
@@ -379,15 +394,19 @@ function drawStarsInGraphics(gfx, count, radius, alpha, seed, worldWidth, worldH
   }
 }
 
-function drawBackground({ bgLayer, starsFar, starsMid, worldWidth, worldHeight }) {
+function drawBackground({ bgLayer, starsVeryFar, starsFar, starsMid, worldWidth, worldHeight }) {
   const starsNear = new PIXI.Container();
 
+  const gfxVeryFar = new PIXI.Graphics();
+  drawStarsInGraphics(gfxVeryFar, 5000, 0.3, 0.1, STAR_SEED_VERY_FAR, worldWidth, worldHeight);
+  starsVeryFar.addChild(gfxVeryFar);
+
   const gfxFar = new PIXI.Graphics();
-  drawStarsInGraphics(gfxFar, 12000, 0.4, 0.15, 111, worldWidth, worldHeight);
+  drawStarsInGraphics(gfxFar, 12000, 0.4, 0.15, STAR_SEED_FAR, worldWidth, worldHeight);
   starsFar.addChild(gfxFar);
 
   const gfxMid = new PIXI.Graphics();
-  drawStarsInGraphics(gfxMid, 6000, 0.8, 0.35, 222, worldWidth, worldHeight);
+  drawStarsInGraphics(gfxMid, 6000, 0.8, 0.35, STAR_SEED_MID, worldWidth, worldHeight);
   starsMid.addChild(gfxMid);
 
   const gfxNear = new PIXI.Graphics();
