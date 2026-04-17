@@ -146,6 +146,11 @@ export function createMap({
     Object.values(sysMap).forEach(({ dot, data }) => {
       if (data.size === 'capital') {
         dot.alpha = 0.75 + Math.sin(pulseT) * 0.25;
+        if (dot._orbitDot) {
+          const angle = pulseT * 0.8;
+          dot._orbitDot.x = Math.cos(angle) * dot._orbitRx;
+          dot._orbitDot.y = Math.sin(angle) * dot._orbitRy;
+        }
       }
     });
   });
@@ -533,6 +538,18 @@ function renderNode(g, sys, r, hover, factions) {
     g.beginFill(color, hover ? 1.0 : 0.92).drawCircle(0, 0, r).endFill();
     g.lineStyle(0.6, color, hover ? 0.7 : 0.4);
     g.drawEllipse(0, 0, r * 2.4, r * 0.9);
+
+    // Orbital dot — travels around the ellipse
+    if (!g._orbitDot) {
+      const orbitDot = new PIXI.Graphics();
+      orbitDot.beginFill(color, 0.9).drawCircle(0, 0, 1.8).endFill();
+      g.addChild(orbitDot);
+
+      // Store reference for animation
+      g._orbitDot = orbitDot;
+    }
+    g._orbitRx = r * 2.4;
+    g._orbitRy = r * 0.9;
   } else if (sys.size === 'major') {
     g.beginFill(color, hover ? 0.1 : 0.06).drawEllipse(0, 0, r * 2.6, (r * 2.6) / 0.72).endFill();
     g.beginFill(color, hover ? 0.25 : 0.15).drawEllipse(0, 0, r * 1.6, (r * 1.6) / 0.72).endFill();
