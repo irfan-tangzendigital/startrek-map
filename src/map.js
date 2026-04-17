@@ -402,12 +402,13 @@ function drawTerritories({ overlayLayer, factions }) {
       f.short,
       new PIXI.TextStyle({
         fontFamily: 'Antonio,Courier New',
-        fontSize: 22,
+        fontSize: 28,
         fill: f.color,
         letterSpacing: 5,
         fontWeight: '700',
       }),
     );
+    lbl.resolution = window.devicePixelRatio * 3;
     lbl.anchor.set(0.5);
     lbl.x = c.x / c.n;
     lbl.y = c.y / c.n;
@@ -457,6 +458,7 @@ function drawSystems({
         letterSpacing: 1.4,
       }),
     );
+    lbl.resolution = window.devicePixelRatio * 3;
     lbl.anchor.set(0, 0.5);
     lbl.x = sys.x + r + 5;
     lbl.y = sys.y;
