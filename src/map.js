@@ -5,34 +5,35 @@ const DEFAULT_WORLD_H = 1600;
 
 const RADII = { capital: 8, major: 5, minor: 3.5 };
 
+/** r and alpha scaled −30% / −40% from original art; drawn as 3 radial passes each */
 const FACTION_BLOBS = [
   // Federation — centre Alpha
-  { faction: 'federation', x: 900, y: 500, r: 320, alpha: 0.1 },
-  { faction: 'federation', x: 820, y: 600, r: 250, alpha: 0.08 },
-  { faction: 'federation', x: 980, y: 450, r: 200, alpha: 0.07 },
-  { faction: 'federation', x: 1050, y: 580, r: 180, alpha: 0.06 },
+  { faction: 'federation', x: 900, y: 500, r: 224, alpha: 0.06 },
+  { faction: 'federation', x: 820, y: 600, r: 175, alpha: 0.048 },
+  { faction: 'federation', x: 980, y: 450, r: 140, alpha: 0.042 },
+  { faction: 'federation', x: 1050, y: 580, r: 126, alpha: 0.036 },
   // Klingon — mid Beta
-  { faction: 'klingon', x: 1600, y: 620, r: 300, alpha: 0.1 },
-  { faction: 'klingon', x: 1750, y: 500, r: 240, alpha: 0.08 },
-  { faction: 'klingon', x: 1680, y: 750, r: 200, alpha: 0.07 },
-  { faction: 'klingon', x: 1500, y: 680, r: 180, alpha: 0.06 },
+  { faction: 'klingon', x: 1600, y: 620, r: 210, alpha: 0.06 },
+  { faction: 'klingon', x: 1750, y: 500, r: 168, alpha: 0.048 },
+  { faction: 'klingon', x: 1680, y: 750, r: 140, alpha: 0.042 },
+  { faction: 'klingon', x: 1500, y: 680, r: 126, alpha: 0.036 },
   // Romulan — upper Beta
-  { faction: 'romulan', x: 1500, y: 250, r: 280, alpha: 0.1 },
-  { faction: 'romulan', x: 1650, y: 180, r: 220, alpha: 0.08 },
-  { faction: 'romulan', x: 1380, y: 320, r: 180, alpha: 0.07 },
+  { faction: 'romulan', x: 1500, y: 250, r: 196, alpha: 0.06 },
+  { faction: 'romulan', x: 1650, y: 180, r: 154, alpha: 0.048 },
+  { faction: 'romulan', x: 1380, y: 320, r: 126, alpha: 0.042 },
   // Cardassian — lower-left Alpha
-  { faction: 'cardassian', x: 700, y: 880, r: 260, alpha: 0.1 },
-  { faction: 'cardassian', x: 600, y: 980, r: 200, alpha: 0.08 },
-  { faction: 'cardassian', x: 800, y: 950, r: 170, alpha: 0.07 },
+  { faction: 'cardassian', x: 700, y: 880, r: 182, alpha: 0.06 },
+  { faction: 'cardassian', x: 600, y: 980, r: 140, alpha: 0.048 },
+  { faction: 'cardassian', x: 800, y: 950, r: 119, alpha: 0.042 },
   // Ferengi — upper-left Alpha
-  { faction: 'ferengi', x: 480, y: 450, r: 220, alpha: 0.1 },
-  { faction: 'ferengi', x: 380, y: 520, r: 170, alpha: 0.08 },
+  { faction: 'ferengi', x: 480, y: 450, r: 154, alpha: 0.06 },
+  { faction: 'ferengi', x: 380, y: 520, r: 119, alpha: 0.048 },
   // Breen — lower Alpha
-  { faction: 'breen', x: 720, y: 1150, r: 220, alpha: 0.1 },
-  { faction: 'breen', x: 620, y: 1250, r: 170, alpha: 0.08 },
+  { faction: 'breen', x: 720, y: 1150, r: 154, alpha: 0.06 },
+  { faction: 'breen', x: 620, y: 1250, r: 119, alpha: 0.048 },
   // Dominion — lower centre
-  { faction: 'dominion', x: 800, y: 1050, r: 190, alpha: 0.09 },
-  { faction: 'dominion', x: 700, y: 1150, r: 150, alpha: 0.07 },
+  { faction: 'dominion', x: 800, y: 1050, r: 133, alpha: 0.054 },
+  { faction: 'dominion', x: 700, y: 1150, r: 105, alpha: 0.042 },
 ];
 
 export function createMap({
@@ -369,12 +370,21 @@ function drawBackground({ bgLayer, starsFar, starsMid, worldWidth, worldHeight }
   bgLayer.addChild(starsNear);
 }
 
+/** Halo (faint outer) → main body → bright core; centre reads brighter than edge */
+function drawRadialFactionBlob(g, color, x, y, r, alpha) {
+  const haloA = alpha * 0.4;
+  const coreA = Math.min(1, alpha * 1.5);
+  g.beginFill(color, haloA).drawCircle(x, y, r * 1.3).endFill();
+  g.beginFill(color, alpha).drawCircle(x, y, r).endFill();
+  g.beginFill(color, coreA).drawCircle(x, y, r * 0.6).endFill();
+}
+
 function drawTerritories({ overlayLayer, factions }) {
   const g = new PIXI.Graphics();
   FACTION_BLOBS.forEach((blob) => {
     const f = factions[blob.faction];
     if (!f) return;
-    g.beginFill(f.color, blob.alpha).drawCircle(blob.x, blob.y, blob.r).endFill();
+    drawRadialFactionBlob(g, f.color, blob.x, blob.y, blob.r, blob.alpha);
   });
   overlayLayer.addChild(g);
 
