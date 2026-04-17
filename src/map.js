@@ -123,6 +123,18 @@ export function createMap({
     onSelect: handleSelect,
     isSelected: (sys) => selectedSystem?.id === sys.id,
   });
+
+  let pulseT = 0;
+  app.ticker.add(() => {
+    const dt = app.ticker.deltaMS / 1000;
+    pulseT += dt * 0.03;
+    Object.values(sysMap).forEach(({ dot, data }) => {
+      if (data.size === 'capital') {
+        dot.alpha = 0.88 + Math.sin(pulseT) * 0.12;
+      }
+    });
+  });
+
   updateLabelsVisibility({ sysMap, world, activeFactions });
   if (onZoomChange) onZoomChange(world.scale.x);
 
@@ -211,20 +223,14 @@ export function createMap({
   function setFactionEnabled(id, enabled) {
     if (enabled) activeFactions.add(id);
     else activeFactions.delete(id);
-
-    const showLabels = world.scale.x > 0.54;
-    Object.values(sysMap).forEach(({ dot, lbl, data }) => {
-      const visible = activeFactions.has(data.faction);
-      dot.visible = visible;
-      lbl.visible = visible && showLabels;
-    });
+    updateLabelsVisibility({ sysMap, world, activeFactions });
   }
 
   function setSelectedSystem(sysOrNull) {
     if (sysOrNull === null) {
       if (selectedSystem) {
         const prev = sysMap[selectedSystem.id];
-        if (prev) renderDot(prev.dot, prev.data, prev.r, false, factions);
+        if (prev) renderNode(prev.dot, prev.data, prev.r, false, factions);
       }
       selectedSystem = null;
       if (glowGfx) {
@@ -244,10 +250,35 @@ export function createMap({
     handleSelect(next, ref.dot, ref.r);
   }
 
+  function drawReticle(x, y, r, color) {
+    const g = new PIXI.Graphics();
+    const s = r * 3.5;
+    const arm = s * 0.45;
+    g.lineStyle(1.2, color, 0.85);
+    g.moveTo(-s, -s + arm).lineTo(-s, -s).lineTo(-s + arm, -s);
+    g.moveTo(s - arm, -s).lineTo(s, -s).lineTo(s, -s + arm);
+    g.moveTo(s, s - arm).lineTo(s, s).lineTo(s - arm, s);
+    g.moveTo(-s + arm, s).lineTo(-s, s).lineTo(-s, s - arm);
+    g.x = x;
+    g.y = y;
+    glowLayer.addChild(g);
+
+    const rotateReticle = () => {
+      if (!g.parent) {
+        app.ticker.remove(rotateReticle);
+        return;
+      }
+      const dt = app.ticker.deltaMS / 1000;
+      g.rotation += dt * 0.004;
+    };
+    app.ticker.add(rotateReticle);
+    return g;
+  }
+
   function handleSelect(sys, dot, r) {
     if (selectedSystem) {
       const prev = sysMap[selectedSystem.id];
-      if (prev) renderDot(prev.dot, prev.data, prev.r, false, factions);
+      if (prev) renderNode(prev.dot, prev.data, prev.r, false, factions);
     }
     if (glowGfx) {
       glowLayer.removeChild(glowGfx);
@@ -261,14 +292,10 @@ export function createMap({
     }
 
     selectedSystem = sys;
-    renderDot(dot, sys, r, true, factions);
+    renderNode(dot, sys, r, true, factions);
 
-    const f = factions[sys.faction];
-    glowGfx = new PIXI.Graphics();
-    glowGfx.lineStyle(1.5, f.color, 0.5).drawCircle(0, 0, r * 3.5);
-    glowGfx.x = sys.x;
-    glowGfx.y = sys.y;
-    glowLayer.addChild(glowGfx);
+    const f = factions[sys.faction] || factions.independent;
+    glowGfx = drawReticle(sys.x, sys.y, r, f.color);
 
     if (onSelectionChange) onSelectionChange(sys);
   }
@@ -431,23 +458,27 @@ function drawSystems({
   systems.forEach((sys) => {
     const r = RADII[sys.size] || 4;
     const dot = new PIXI.Graphics();
-    renderDot(dot, sys, r, false, factions);
+    renderNode(dot, sys, r, false, factions);
     dot.x = sys.x;
     dot.y = sys.y;
     dot.eventMode = 'static';
     dot.cursor = 'pointer';
     dot.on('pointerover', () => {
       if (isSelected?.(sys)) return;
-      renderDot(dot, sys, r, true, factions);
+      renderNode(dot, sys, r, true, factions);
     });
     dot.on('pointerout', () => {
       if (isSelected?.(sys)) return;
-      renderDot(dot, sys, r, false, factions);
+      renderNode(dot, sys, r, false, factions);
     });
     dot.on('pointerdown', (e) => {
       e.stopPropagation();
       onSelect?.(sys, dot, r);
     });
+
+    if (sys.size === 'minor' || !sys.size) {
+      dot.visible = world.scale.x > 0.7;
+    }
 
     const lbl = new PIXI.Text(
       sys.name,
@@ -470,39 +501,39 @@ function drawSystems({
   });
 }
 
-function renderDot(g, sys, r, hover, factions) {
-  const f = factions[sys.faction];
+function renderNode(g, sys, r, hover, factions) {
+  const f = factions[sys.faction] || factions.independent;
+  const color = f.color;
   g.clear();
-  if (!f) return;
 
   if (sys.size === 'capital') {
-    const s = hover ? r * 1.6 : r;
-    g.beginFill(f.color, hover ? 1 : 0.92)
-      .moveTo(0, -s * 1.45)
-      .lineTo(s, 0)
-      .lineTo(0, s * 1.45)
-      .lineTo(-s, 0)
-      .closePath()
-      .endFill();
-    g.lineStyle(0.5, 0xffffff, 0.3)
-      .moveTo(0, -s * 1.45)
-      .lineTo(s, 0)
-      .lineTo(0, s * 1.45)
-      .lineTo(-s, 0)
-      .closePath();
+    g.beginFill(color, hover ? 0.12 : 0.07).drawCircle(0, 0, r * 3.2).endFill();
+    g.beginFill(color, hover ? 0.28 : 0.18).drawCircle(0, 0, r * 1.8).endFill();
+    g.beginFill(color, hover ? 1.0 : 0.92).drawCircle(0, 0, r).endFill();
+    g.lineStyle(0.6, color, hover ? 0.7 : 0.4);
+    g.drawEllipse(0, 0, r * 2.4, r * 0.9);
+  } else if (sys.size === 'major') {
+    g.beginFill(color, hover ? 0.1 : 0.06).drawCircle(0, 0, r * 2.6).endFill();
+    g.beginFill(color, hover ? 0.25 : 0.15).drawCircle(0, 0, r * 1.6).endFill();
+    g.beginFill(color, hover ? 1.0 : 0.88).drawCircle(0, 0, r).endFill();
   } else {
-    const rad = hover ? r * 1.45 : r;
-    g.beginFill(f.color, hover ? 1 : 0.87).drawCircle(0, 0, rad).endFill();
-    if (sys.size === 'major') g.lineStyle(0.5, 0xffffff, 0.25).drawCircle(0, 0, rad);
+    // Minor — barely visible, only a faint pixel
+    g.beginFill(color, hover ? 0.12 : 0.04).drawCircle(0, 0, r * 1.8).endFill();
+    g.beginFill(color, hover ? 0.7 : 0.22).drawCircle(0, 0, r).endFill();
   }
 }
 
 function updateLabelsVisibility({ sysMap, world, activeFactions }) {
-  const show = world.scale.x > 0.54;
-  Object.values(sysMap).forEach(({ lbl, data, dot }) => {
-    const enabled = activeFactions.has(data.faction);
-    dot.visible = enabled;
-    lbl.visible = enabled && show;
+  const showMinor = world.scale.x > 0.7;
+  const showLabels = world.scale.x > 0.54;
+  Object.values(sysMap).forEach(({ dot, lbl, data }) => {
+    const factionVisible = activeFactions.has(data.faction);
+    if (data.size === 'minor' || !data.size) {
+      dot.visible = factionVisible && showMinor;
+    } else {
+      dot.visible = factionVisible;
+    }
+    lbl.visible = factionVisible && showLabels;
   });
 }
 
