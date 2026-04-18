@@ -154,14 +154,14 @@ export async function initMap(systems, factions, callbacks = {}) {
     0.01,
     2000,
   );
-  camera.position.set(0, 40, 60);
+  camera.position.set(0, 55, 85);
 
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
   controls.autoRotate = true;
   controls.autoRotateSpeed = 0.15;
-  controls.minDistance = 0.1;
+  controls.minDistance = 0.05;
   controls.maxDistance = 80;
   controls.target.set(0, 0, 0);
 
@@ -387,7 +387,7 @@ export async function initMap(systems, factions, callbacks = {}) {
 
   function resetView() {
     flyTo = null;
-    camera.position.set(0, 40, 60);
+    camera.position.set(0, 55, 85);
     controls.target.set(0, 0, 0);
     controls.update();
     bumpAutoRotate();
@@ -399,7 +399,7 @@ export async function initMap(systems, factions, callbacks = {}) {
   function zoomIn() {
     const dir = new THREE.Vector3()
       .subVectors(camera.position, controls.target)
-      .multiplyScalar(1 - 1 / 1.4);
+      .multiplyScalar(1 - 1 / 1.5);
     camera.position.sub(dir);
     const dist = camera.position.distanceTo(controls.target);
     if (dist < controls.minDistance) {
@@ -415,7 +415,7 @@ export async function initMap(systems, factions, callbacks = {}) {
   function zoomOut() {
     const dir = new THREE.Vector3()
       .subVectors(camera.position, controls.target)
-      .multiplyScalar(1 - 1 / 1.4);
+      .multiplyScalar(1 - 1 / 1.5);
     camera.position.add(dir);
     const dist = camera.position.distanceTo(controls.target);
     if (dist > controls.maxDistance) {
@@ -498,56 +498,44 @@ function makeStarTexture(THREE) {
 }
 
 function buildSkybox(scene, THREE, starTex) {
-  const N = 8000;
-  const positions = new Float32Array(N * 3);
-  const colors = new Float32Array(N * 3);
+  const positions = [];
+  const colors = [];
   const rng = mulberry32(9999);
 
-  for (let i = 0; i < N; i++) {
-    // Uniform points on a sphere of radius 300 — must stay outside the
-    // camera's maxDistance (80) so the sphere never inverts on the viewer.
-    const u = rng();
-    const v = rng();
-    const theta = 2 * Math.PI * u;
-    const phi = Math.acos(2 * v - 1);
-    const r = 300;
-    positions[i * 3 + 0] = r * Math.sin(phi) * Math.cos(theta);
-    positions[i * 3 + 1] = r * Math.cos(phi);
-    positions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
-
-    const blueish = rng() < 0.12;
-    const alpha = 0.3 + rng() * 0.7;
-    if (blueish) {
-      colors[i * 3 + 0] = 0.7 * alpha;
-      colors[i * 3 + 1] = 0.8 * alpha;
-      colors[i * 3 + 2] = 1.0 * alpha;
-    } else {
-      colors[i * 3 + 0] = alpha;
-      colors[i * 3 + 1] = alpha;
-      colors[i * 3 + 2] = alpha;
-    }
+  for (let i = 0; i < 8000; i++) {
+    const theta = rng() * Math.PI * 2;
+    const phi = Math.acos(2 * rng() - 1);
+    const r = 250;
+    positions.push(
+      r * Math.sin(phi) * Math.cos(theta),
+      r * Math.sin(phi) * Math.sin(theta),
+      r * Math.cos(phi),
+    );
+    const blue = rng() < 0.12;
+    const v = 0.4 + rng() * 0.6;
+    colors.push(blue ? 0.7 * v : v, blue ? 0.8 * v : v, blue ? v : v * 0.9);
   }
 
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+  const starGeo = new THREE.BufferGeometry();
+  starGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  starGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
-  const mat = new THREE.PointsMaterial({
+  // sizeAttenuation: false keeps each star a constant pixel size regardless
+  // of camera distance, so the starfield reads like a real sky at any zoom.
+  const starMat = new THREE.PointsMaterial({
+    size: 0.8,
     vertexColors: true,
-    size: 0.3,
-    sizeAttenuation: true,
-    transparent: true,
-    opacity: 0.8,
-    depthWrite: false,
-    depthTest: false,
     map: starTex,
     alphaTest: 0.01,
+    transparent: true,
+    depthWrite: false,
+    depthTest: false,
+    sizeAttenuation: false,
   });
-  const skybox = new THREE.Points(geo, mat);
-  skybox.renderOrder = -2;
-  skybox.material.depthWrite = false;
-  skybox.material.depthTest = false;
+
+  const skybox = new THREE.Points(starGeo, starMat);
   skybox.frustumCulled = false;
+  skybox.renderOrder = -10;
   scene.add(skybox);
 }
 
