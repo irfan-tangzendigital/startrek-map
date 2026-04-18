@@ -54,6 +54,24 @@ const QUADRANT_BOUNDS = {
   fallback: { xMin: 200, xMax: 2200, yMin: 100, yMax: 1500 },
 };
 
+const FACTION_ZONES_3D = {
+  federation:  { x: [-3,  +1], y: [-1, +1], z: [-3, +3] },
+  klingon:     { x: [+4, +10], y: [-1, +1], z: [-2, +4] },
+  romulan:     { x: [+4, +10], y: [-1, +2], z: [-6, -2] },
+  cardassian:  { x: [-8,  -3], y: [-1, +1], z: [+2, +6] },
+  ferengi:     { x: [-8,  -3], y: [-1, +1], z: [-4, -1] },
+  breen:       { x: [-6,  -2], y: [-2,  0], z: [+4, +8] },
+  dominion:    { x: [-4,   0], y: [-2,  0], z: [+3, +7] },
+  independent: { x: [-12, +12], y: [-2, +2], z: [-8, +8] },
+};
+
+const QUADRANT_ZONES_3D = {
+  'Alpha Quadrant': { x: [-12,   0], y: [-2, +2], z: [-8, +8] },
+  'Beta Quadrant':  { x: [  0, +12], y: [-2, +2], z: [-8, +8] },
+};
+
+const FALLBACK_3D = { x: [-12, +12], y: [-2, +2], z: [-8, +8] };
+
 function normalizeFactionKey(faction) {
   const f = String(faction ?? '')
     .trim()
@@ -92,6 +110,38 @@ export function generatePosition(system) {
   return { x: Math.round(x), y: Math.round(y) };
 }
 
+function zoneFromFaction3D(faction) {
+  const f = String(faction ?? '').trim().toLowerCase();
+  return FACTION_ZONES_3D[f] || null;
+}
+
+function zoneFromQuadrant3D(quadrant) {
+  const q = String(quadrant ?? '').toLowerCase();
+  if (q.includes('alpha')) return QUADRANT_ZONES_3D['Alpha Quadrant'];
+  if (q.includes('beta')) return QUADRANT_ZONES_3D['Beta Quadrant'];
+  return null;
+}
+
+/**
+ * Deterministic 3D position for a system when no HYG real-star mapping is
+ * available. Uses a faction zone, then a quadrant zone, then a global
+ * fallback. Seeded with uid+'_3d' so positions stay stable across runs
+ * and are independent of the 2D x/y generator.
+ */
+export function generatePos3D(system) {
+  const zone =
+    zoneFromFaction3D(system?.faction) ||
+    zoneFromQuadrant3D(system?.quadrant) ||
+    FALLBACK_3D;
+  const seedInput = `${system?.uid || system?.name || ''}_3d`;
+  const rng = mulberry32(hashUidToSeed(seedInput));
+  return {
+    x: +(zone.x[0] + rng() * (zone.x[1] - zone.x[0])).toFixed(3),
+    y: +(zone.y[0] + rng() * (zone.y[1] - zone.y[0])).toFixed(3),
+    z: +(zone.z[0] + rng() * (zone.z[1] - zone.z[0])).toFixed(3),
+  };
+}
+
 function isMissingCoord(v) {
   return v === undefined || v === null || v === '';
 }
@@ -111,8 +161,29 @@ export async function buildSystems() {
     Object.entries(overrides).map(([name, obj]) => [normName(name), obj]),
   );
 
+  const usedOverrideNames = new Set();
+
+  function finalize(merged) {
+    if (isMissingCoord(merged.x) || isMissingCoord(merged.y)) {
+      const pos = generatePosition(merged);
+      if (isMissingCoord(merged.x)) merged.x = pos.x;
+      if (isMissingCoord(merged.y)) merged.y = pos.y;
+    }
+
+    // 3D position — HYG real coords take priority, then generated.
+    if (merged.hyg3d) {
+      merged.pos3d = merged.hyg3d;
+    } else {
+      merged.pos3d = generatePos3D(merged);
+    }
+
+    return merged;
+  }
+
   const out = stapiRaw.map((entry) => {
-    const o = overridesByName.get(normName(entry?.name));
+    const key = normName(entry?.name);
+    const o = overridesByName.get(key);
+    if (o) usedOverrideNames.add(key);
     const merged = o
       ? { ...entry, ...o }
       : {
@@ -122,14 +193,31 @@ export async function buildSystems() {
           quadrant: entry?.location?.name,
         };
 
-    if (isMissingCoord(merged.x) || isMissingCoord(merged.y)) {
-      const pos = generatePosition(merged);
-      if (isMissingCoord(merged.x)) merged.x = pos.x;
-      if (isMissingCoord(merged.y)) merged.y = pos.y;
-    }
-
-    return merged;
+    return finalize(merged);
   });
+
+  // Emit synthetic records for overrides whose names don't appear in STAPI
+  // (e.g. "Vulcan" vs STAPI's "Vulcan system"). These carry hand-authored
+  // data and/or HYG coordinates that would otherwise be dropped.
+  for (const [rawName, ovr] of Object.entries(overrides)) {
+    const key = normName(rawName);
+    if (usedOverrideNames.has(key)) continue;
+    const slug =
+      (ovr.id && String(ovr.id)) ||
+      rawName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '_')
+        .replace(/^_|_$/g, '');
+    const synthetic = {
+      uid: `override_${slug || key}`,
+      name: rawName,
+      astronomicalObjectType: 'STAR_SYSTEM',
+      ...ovr,
+    };
+    out.push(finalize(synthetic));
+  }
+
+  out.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
 
   await writeJson(outPath, out);
   console.log(`[build_systems] wrote ${out.length} records to ${outPath}`);
@@ -137,7 +225,15 @@ export async function buildSystems() {
   return { outPath, count: out.length };
 }
 
-if (import.meta.url === `file://${process.argv[1].replaceAll('\\', '/')}`) {
+const isMain = (() => {
+  if (!process.argv[1]) return false;
+  const entryUrl = new URL(
+    `file://${path.resolve(process.argv[1]).replaceAll('\\', '/')}`,
+  ).href;
+  return import.meta.url === entryUrl;
+})();
+
+if (isMain) {
   buildSystems().catch((err) => {
     console.error(err);
     process.exitCode = 1;

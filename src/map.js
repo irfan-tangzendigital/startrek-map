@@ -1,581 +1,625 @@
-import * as PIXI from 'pixi.js';
+const THREE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+const ORBIT_URL = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js';
 
-const DEFAULT_WORLD_W = 2400;
-const DEFAULT_WORLD_H = 1600;
+const FACTION_ZONES_3D = {
+  federation:  { x: [-3,  +1], y: [-1, +1], z: [-3, +3] },
+  klingon:     { x: [+4, +10], y: [-1, +1], z: [-2, +4] },
+  romulan:     { x: [+4, +10], y: [-1, +2], z: [-6, -2] },
+  cardassian:  { x: [-8,  -3], y: [-1, +1], z: [+2, +6] },
+  ferengi:     { x: [-8,  -3], y: [-1, +1], z: [-4, -1] },
+  breen:       { x: [-6,  -2], y: [-2,  0], z: [+4, +8] },
+  dominion:    { x: [-4,   0], y: [-2,  0], z: [+3, +7] },
+  independent: { x: [-12, +12], y: [-2, +2], z: [-8, +8] },
+};
 
-const RADII = { capital: 8, major: 5, minor: 3.5 };
+const CAPITAL_LABEL_DIST = 8;
+const MAJOR_LABEL_DIST = 5;
+const AUTOROTATE_RESUME_MS = 4000;
 
-/** Mulberry seeds for star layers — reused for ±5% parallax variation */
-const STAR_SEED_VERY_FAR = 44;
-const STAR_SEED_FAR = 111;
-const STAR_SEED_MID = 222;
-
-/** Ambient nebula-style blobs; drawn as 3 radial passes each */
-const FACTION_BLOBS = [
-  // Federation — centre Alpha
-  { faction: 'federation', x: 950, y: 560, r: 210, alpha: 0.038 },
-  { faction: 'federation', x: 860, y: 650, r: 165, alpha: 0.03 },
-  { faction: 'federation', x: 1040, y: 510, r: 140, alpha: 0.026 },
-  { faction: 'federation', x: 1000, y: 680, r: 125, alpha: 0.022 },
-  // Klingon — mid Beta
-  { faction: 'klingon', x: 1620, y: 580, r: 200, alpha: 0.038 },
-  { faction: 'klingon', x: 1760, y: 460, r: 160, alpha: 0.03 },
-  { faction: 'klingon', x: 1690, y: 720, r: 135, alpha: 0.026 },
-  { faction: 'klingon', x: 1520, y: 650, r: 120, alpha: 0.022 },
-  // Romulan — upper Beta
-  { faction: 'romulan', x: 1520, y: 200, r: 185, alpha: 0.038 },
-  { faction: 'romulan', x: 1680, y: 140, r: 145, alpha: 0.03 },
-  { faction: 'romulan', x: 1390, y: 280, r: 120, alpha: 0.026 },
-  // Cardassian — lower left Alpha
-  { faction: 'cardassian', x: 620, y: 920, r: 175, alpha: 0.038 },
-  { faction: 'cardassian', x: 520, y: 1020, r: 135, alpha: 0.03 },
-  { faction: 'cardassian', x: 720, y: 1000, r: 115, alpha: 0.026 },
-  // Ferengi — upper left Alpha
-  { faction: 'ferengi', x: 560, y: 380, r: 148, alpha: 0.038 },
-  { faction: 'ferengi', x: 460, y: 460, r: 115, alpha: 0.03 },
-  // Breen — lower centre Alpha
-  { faction: 'breen', x: 820, y: 1180, r: 148, alpha: 0.038 },
-  { faction: 'breen', x: 720, y: 1280, r: 115, alpha: 0.03 },
-  // Dominion — lower centre
-  { faction: 'dominion', x: 920, y: 1080, r: 128, alpha: 0.034 },
-  { faction: 'dominion', x: 820, y: 1180, r: 100, alpha: 0.026 },
-];
-
-export function createMap({
-  mountEl,
-  factions,
-  systems,
-  worldWidth = DEFAULT_WORLD_W,
-  worldHeight = DEFAULT_WORLD_H,
-  onSelectionChange,
-  onZoomChange,
-  onCoordsChange,
-} = {}) {
-  if (!mountEl) throw new Error('createMap: mountEl is required');
-
-  const initialScale =
-    Math.min(window.innerWidth / worldWidth, window.innerHeight / worldHeight) * 0.88;
-
-  const app = new PIXI.Application({
-    width: window.innerWidth,
-    height: window.innerHeight,
-    backgroundColor: 0x000011,
-    antialias: true,
-    resolution: window.devicePixelRatio || 1,
-    autoDensity: true,
-    autoStart: true,
-  });
-
-  mountEl.appendChild(app.view);
-  app.view.id = 'map-canvas';
-
-  const world = new PIXI.Container();
-  const starsVeryFar = new PIXI.Container();
-  const starsFar = new PIXI.Container();
-  const starsMid = new PIXI.Container();
-  const bgLayer = new PIXI.Container();
-  const overlayLayer = new PIXI.Container();
-  const glowLayer = new PIXI.Container();
-  const sysLayer = new PIXI.Container();
-  const lblLayer = new PIXI.Container();
-  world.addChild(bgLayer, overlayLayer, glowLayer, sysLayer, lblLayer);
-
-  /** Parallax layers (screen space); behind `world` in z-order */
-  app.stage.addChild(starsVeryFar, starsFar, starsMid, world);
-
-  function applyWorldPerspective() {
-    world.skew.x = -0.08;
-    world.scale.y = world.scale.x * 0.72;
-  }
-
-  world.scale.set(initialScale);
-  applyWorldPerspective();
-  world.x = (app.screen.width - worldWidth * initialScale) / 2;
-  world.y = (app.screen.height - worldHeight * initialScale) / 2;
-
-  function syncParallaxStars() {
-    const parallaxFar = 0.38 + Math.sin(STAR_SEED_FAR) * 0.02;
-    const parallaxMid = 0.68 + Math.cos(STAR_SEED_MID) * 0.02;
-
-    starsVeryFar.scale.set(world.scale.x, world.scale.y);
-    starsVeryFar.skew.set(world.skew.x, world.skew.y);
-    starsVeryFar.position.set(world.x * 0.2, world.y * 0.2);
-
-    starsFar.scale.set(world.scale.x, world.scale.y);
-    starsFar.skew.x = world.skew.x;
-    starsFar.skew.y = world.skew.y;
-    starsFar.position.set(world.x * parallaxFar, world.y * parallaxFar);
-
-    starsMid.scale.set(world.scale.x, world.scale.y);
-    starsMid.skew.x = world.skew.x;
-    starsMid.skew.y = world.skew.y;
-    starsMid.position.set(world.x * parallaxMid, world.y * parallaxMid);
-  }
-  syncParallaxStars();
-
-  const sysMap = {};
-  const activeFactions = new Set(Object.keys(factions));
-  let selectedSystem = null;
-  let glowGfx = null;
-
-  drawBackground({
-    bgLayer,
-    starsVeryFar,
-    starsFar,
-    starsMid,
-    worldWidth,
-    worldHeight,
-  });
-  drawTerritories({ overlayLayer, factions });
-  drawSystems({
-    sysLayer,
-    lblLayer,
-    systems,
-    factions,
-    sysMap,
-    world,
-    activeFactions,
-    onSelect: handleSelect,
-    isSelected: (sys) => selectedSystem?.id === sys.id,
-  });
-
-  let pulseT = 0;
-  app.ticker.add(() => {
-    const dt = app.ticker.deltaMS / 1000;
-    pulseT += dt * 0.03;
-    Object.values(sysMap).forEach(({ dot, data }) => {
-      if (data.size === 'capital') {
-        dot.alpha = 0.75 + Math.sin(pulseT) * 0.25;
-        if (dot._orbitDot) {
-          const angle = pulseT * 0.8;
-          dot._orbitDot.x = Math.cos(angle) * dot._orbitRx;
-          dot._orbitDot.y = Math.sin(angle) * dot._orbitRy;
-        }
-      }
+function injectScript(src) {
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[data-src="${src}"]`);
+    if (existing) {
+      if (existing.dataset.loaded === 'true') return resolve();
+      existing.addEventListener('load', () => resolve());
+      existing.addEventListener('error', reject);
+      return;
+    }
+    const s = document.createElement('script');
+    s.src = src;
+    s.async = false;
+    s.dataset.src = src;
+    s.addEventListener('load', () => {
+      s.dataset.loaded = 'true';
+      resolve();
     });
+    s.addEventListener('error', reject);
+    document.head.appendChild(s);
   });
+}
 
-  updateLabelsVisibility({ sysMap, world, activeFactions });
-  if (onZoomChange) onZoomChange(world.scale.x);
+let threeReady = null;
+async function loadThree() {
+  if (window.THREE && window.THREE.OrbitControls) return;
+  if (threeReady) return threeReady;
+  threeReady = (async () => {
+    await injectScript(THREE_URL);
+    await injectScript(ORBIT_URL);
+  })();
+  return threeReady;
+}
 
-  // Ensure at least one frame is rendered immediately (some environments
-  // won't paint until the ticker runs).
-  app.start();
-  app.render();
-
-  // Pan + zoom
-  function computeZoomMin() {
-    return (
-      Math.min(window.innerWidth / worldWidth, window.innerHeight / worldHeight) * 0.85
-    );
-  }
-  let zoomMin = computeZoomMin();
-  const ZOOM_MAX = 4.5;
-  let isDragging = false;
-  let dragStart = { x: 0, y: 0 };
-  let worldStart = { x: 0, y: 0 };
-
-  app.stage.eventMode = 'static';
-  app.stage.hitArea = app.screen;
-
-  app.stage.on('pointerdown', (e) => {
-    isDragging = true;
-    dragStart = { x: e.global.x, y: e.global.y };
-    worldStart = { x: world.x, y: world.y };
-    app.view.classList.add('dragging');
-  });
-
-  app.stage.on('pointermove', (e) => {
-    if (onCoordsChange) {
-      const wx = Math.round((e.global.x - world.x) / world.scale.x);
-      const wy = Math.round((e.global.y - world.y) / world.scale.y);
-      onCoordsChange({ wx, wy });
-    }
-    if (!isDragging) return;
-    const dx = e.global.x - dragStart.x;
-    const dy = e.global.y - dragStart.y;
-    world.x = worldStart.x + dx;
-    world.y = worldStart.y + dy;
-    syncParallaxStars();
-  });
-
-  const endDrag = () => {
-    isDragging = false;
-    app.view.classList.remove('dragging');
-  };
-  app.stage.on('pointerup', endDrag);
-  app.stage.on('pointerupoutside', endDrag);
-
-  app.view.addEventListener(
-    'wheel',
-    (e) => {
-      e.preventDefault();
-      zoomAt(e.clientX, e.clientY, e.deltaY < 0 ? 1.12 : 0.89);
-    },
-    { passive: false },
-  );
-
-  function zoomAt(mx, my, factor) {
-    const nextScale = Math.min(ZOOM_MAX, Math.max(zoomMin, world.scale.x * factor));
-    const ratio = nextScale / world.scale.x;
-    world.x = mx + (world.x - mx) * ratio;
-    world.y = my + (world.y - my) * ratio;
-    world.scale.set(nextScale);
-    applyWorldPerspective();
-    syncParallaxStars();
-    onZoom();
-  }
-
-  function onZoom() {
-    updateLabelsVisibility({ sysMap, world, activeFactions });
-    if (onZoomChange) onZoomChange(world.scale.x);
-  }
-
-  function resetView() {
-    world.scale.set(initialScale);
-    applyWorldPerspective();
-    world.x = (app.screen.width - worldWidth * initialScale) / 2;
-    world.y = (app.screen.height - worldHeight * initialScale) / 2;
-    syncParallaxStars();
-    onZoom();
-  }
-
-  function setFactionEnabled(id, enabled) {
-    if (enabled) activeFactions.add(id);
-    else activeFactions.delete(id);
-    updateLabelsVisibility({ sysMap, world, activeFactions });
-  }
-
-  function setSelectedSystem(sysOrNull) {
-    if (sysOrNull === null) {
-      if (selectedSystem) {
-        const prev = sysMap[selectedSystem.id];
-        if (prev) renderNode(prev.dot, prev.data, prev.r, false, factions);
-      }
-      selectedSystem = null;
-      if (glowGfx) {
-        glowLayer.removeChild(glowGfx);
-        glowGfx = null;
-      }
-      if (onSelectionChange) onSelectionChange(null);
-      return;
-    }
-
-    const next = typeof sysOrNull === 'string' ? sysMap[sysOrNull]?.data : sysOrNull;
-    if (!next) return;
-
-    const ref = sysMap[next.id];
-    if (!ref) return;
-
-    handleSelect(next, ref.dot, ref.r);
-  }
-
-  function drawReticle(x, y, r, color) {
-    const g = new PIXI.Graphics();
-    const s = r * 3.5;
-    const arm = s * 0.45;
-    g.lineStyle(1.2, color, 0.85);
-    g.moveTo(-s, -s + arm).lineTo(-s, -s).lineTo(-s + arm, -s);
-    g.moveTo(s - arm, -s).lineTo(s, -s).lineTo(s, -s + arm);
-    g.moveTo(s, s - arm).lineTo(s, s).lineTo(s - arm, s);
-    g.moveTo(-s + arm, s).lineTo(-s, s).lineTo(-s, s - arm);
-    g.x = x;
-    g.y = y;
-    glowLayer.addChild(g);
-
-    const rotateReticle = () => {
-      if (!g.parent) {
-        app.ticker.remove(rotateReticle);
-        return;
-      }
-      const dt = app.ticker.deltaMS / 1000;
-      g.rotation += dt * 0.008;
-      const pulse = 1 + Math.sin(Date.now() * 0.002) * 0.06;
-      g.scale.set(pulse);
-    };
-    app.ticker.add(rotateReticle);
-    return g;
-  }
-
-  function handleSelect(sys, dot, r) {
-    if (selectedSystem) {
-      const prev = sysMap[selectedSystem.id];
-      if (prev) renderNode(prev.dot, prev.data, prev.r, false, factions);
-    }
-    if (glowGfx) {
-      glowLayer.removeChild(glowGfx);
-      glowGfx = null;
-    }
-
-    if (selectedSystem?.id === sys.id) {
-      selectedSystem = null;
-      if (onSelectionChange) onSelectionChange(null);
-      return;
-    }
-
-    selectedSystem = sys;
-    renderNode(dot, sys, r, true, factions);
-
-    const f = factions[sys.faction] || factions.independent;
-    glowGfx = drawReticle(sys.x, sys.y, r, f.color);
-
-    if (onSelectionChange) onSelectionChange(sys);
-  }
-
-  function flyTo(sys, zoom = 1.8) {
-    const ref = sysMap[sys.id];
-    if (!ref) return;
-    const x0 = world.x;
-    const y0 = world.y;
-    const z0 = world.scale.x;
-    const x1 = app.screen.width / 2 - sys.x * zoom;
-    const y1 = app.screen.height / 2 - sys.y * zoom;
-    let t = 0;
-
-    const tick = (dt) => {
-      t = Math.min(t + dt / 48, 1);
-      const p = easeInOut(t);
-      world.x = x0 + (x1 - x0) * p;
-      world.y = y0 + (y1 - y0) * p;
-      world.scale.set(z0 + (zoom - z0) * p);
-      applyWorldPerspective();
-      syncParallaxStars();
-      onZoom();
-      if (t >= 1) {
-        app.ticker.remove(tick);
-        setSelectedSystem(sys);
-      }
-    };
-
-    app.ticker.add(tick);
-  }
-
-  window.addEventListener('resize', () => {
-    app.renderer.resize(window.innerWidth, window.innerHeight);
-    app.stage.hitArea = app.screen;
-    zoomMin = computeZoomMin();
-    if (world.scale.x < zoomMin) {
-      world.scale.set(zoomMin);
-      applyWorldPerspective();
-    }
-    syncParallaxStars();
-  });
-
-  return {
-    app,
-    world,
-    sysMap,
-    activeFactions,
-    zoomAt,
-    resetView,
-    flyTo,
-    setFactionEnabled,
-    setSelectedSystem,
-  };
+function hashString(str) {
+  let h = 0;
+  const s = String(str);
+  for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
 }
 
 function mulberry32(seed) {
   let a = seed >>> 0;
   return function next() {
-    a += 0x6d2b79f5;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
 
-/** Star field over 3× world extent: x ∈ [-W, 2W], y ∈ [-H, 2H] */
-function drawStarsInGraphics(gfx, count, radius, alpha, seed, worldWidth, worldHeight) {
-  const rng = mulberry32(seed);
-  const spanW = worldWidth * 3;
-  const spanH = worldHeight * 3;
-  const x0 = -worldWidth;
-  const y0 = -worldHeight;
-  for (let i = 0; i < count; i++) {
-    const x = x0 + rng() * spanW;
-    const y = y0 + rng() * spanH;
-    const blueWhite = rng() < 0.12;
-    const color = blueWhite ? 0xaabbff : 0xffffff;
-    gfx.beginFill(color, alpha).drawCircle(x, y, radius).endFill();
+function hexToRgb(hex) {
+  return {
+    r: ((hex >> 16) & 0xff) / 255,
+    g: ((hex >> 8) & 0xff) / 255,
+    b: (hex & 0xff) / 255,
+  };
+}
+
+function makeBloomTexture(hex) {
+  const THREE = window.THREE;
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const r = (hex >> 16) & 0xff;
+  const g = (hex >> 8) & 0xff;
+  const b = hex & 0xff;
+  const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  grad.addColorStop(0, `rgba(${r},${g},${b},1)`);
+  grad.addColorStop(0.35, `rgba(${r},${g},${b},0.5)`);
+  grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function makeLabelSprite(text) {
+  const THREE = window.THREE;
+  const pad = 16;
+  const fontSize = 48;
+  const measureCtx = document.createElement('canvas').getContext('2d');
+  measureCtx.font = `${fontSize}px Antonio, sans-serif`;
+  const w = Math.ceil(measureCtx.measureText(text).width) + pad * 2;
+  const h = fontSize + pad * 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  ctx.font = `${fontSize}px Antonio, sans-serif`;
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+  ctx.shadowBlur = 8;
+  ctx.fillText(text, pad, h / 2);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  const mat = new THREE.SpriteMaterial({
+    map: tex,
+    transparent: true,
+    depthWrite: false,
+    depthTest: false,
+  });
+  const sprite = new THREE.Sprite(mat);
+  const scaleFactor = 0.006;
+  sprite.scale.set(w * scaleFactor, h * scaleFactor, 1);
+  sprite.userData.sizeCanvas = { w, h };
+  return sprite;
+}
+
+export async function initMap(systems, factions, callbacks = {}) {
+  await loadThree();
+  const THREE = window.THREE;
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x00000f);
+  const mount = document.getElementById('app');
+  mount.appendChild(renderer.domElement);
+  renderer.domElement.id = 'map-canvas';
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(
+    55,
+    window.innerWidth / window.innerHeight,
+    0.01,
+    2000,
+  );
+  camera.position.set(0, 40, 60);
+
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 0.15;
+  controls.minDistance = 0.5;
+  controls.maxDistance = 120;
+  controls.target.set(0, 0, 0);
+
+  buildSkybox(scene, THREE);
+  buildGrid(scene, THREE);
+  const factionCloudMeshes = buildFactionClouds(scene, factions, THREE);
+
+  const capitalMeshes = [];
+  const majorMeshes = [];
+  const capitalGroups = [];
+  const majorData = [];
+  const factionObjectsByKey = new Map();
+  for (const key of Object.keys(factions)) factionObjectsByKey.set(key, []);
+  factionObjectsByKey.set('__unknown__', []);
+
+  function registerFactionObj(factionKey, obj) {
+    const bucket = factionObjectsByKey.get(factionKey) || factionObjectsByKey.get('__unknown__');
+    bucket.push(obj);
   }
-}
 
-function drawBackground({ bgLayer, starsVeryFar, starsFar, starsMid, worldWidth, worldHeight }) {
-  const starsNear = new PIXI.Container();
+  const minorByFaction = new Map();
+  const minorMeshByFaction = new Map();
 
-  const gfxVeryFar = new PIXI.Graphics();
-  drawStarsInGraphics(gfxVeryFar, 5000, 0.3, 0.1, STAR_SEED_VERY_FAR, worldWidth, worldHeight);
-  starsVeryFar.addChild(gfxVeryFar);
+  for (const sys of systems) {
+    if (!sys.pos3d) continue;
+    const fkey = sys.faction || '__unknown__';
+    const faction = factions[fkey] || factions.independent || { color: 0xaaaaaa, css: '#AAAAAA' };
+    const color = faction.color;
 
-  const gfxFar = new PIXI.Graphics();
-  drawStarsInGraphics(gfxFar, 12000, 0.4, 0.15, STAR_SEED_FAR, worldWidth, worldHeight);
-  starsFar.addChild(gfxFar);
-
-  const gfxMid = new PIXI.Graphics();
-  drawStarsInGraphics(gfxMid, 6000, 0.8, 0.35, STAR_SEED_MID, worldWidth, worldHeight);
-  starsMid.addChild(gfxMid);
-
-  const gfxNear = new PIXI.Graphics();
-  drawStarsInGraphics(gfxNear, 1600, 1.4, 0.7, 333, worldWidth, worldHeight);
-  starsNear.addChild(gfxNear);
-
-  bgLayer.addChild(starsNear);
-}
-
-/** Halo (faint outer) → main body → bright core; centre reads brighter than edge */
-function drawRadialFactionBlob(g, color, x, y, r, alpha) {
-  const haloA = alpha * 0.4;
-  const coreA = Math.min(1, alpha * 1.5);
-  g.beginFill(color, haloA).drawCircle(x, y, r * 1.3).endFill();
-  g.beginFill(color, alpha).drawCircle(x, y, r).endFill();
-  g.beginFill(color, coreA).drawCircle(x, y, r * 0.6).endFill();
-}
-
-function drawTerritories({ overlayLayer, factions }) {
-  const g = new PIXI.Graphics();
-  FACTION_BLOBS.forEach((blob) => {
-    const f = factions[blob.faction];
-    if (!f) return;
-    drawRadialFactionBlob(g, f.color, blob.x, blob.y, blob.r, blob.alpha);
-  });
-  overlayLayer.addChild(g);
-
-  const centroids = {};
-  FACTION_BLOBS.forEach((blob) => {
-    if (!centroids[blob.faction]) centroids[blob.faction] = { x: 0, y: 0, n: 0 };
-    centroids[blob.faction].x += blob.x;
-    centroids[blob.faction].y += blob.y;
-    centroids[blob.faction].n += 1;
-  });
-  Object.entries(centroids).forEach(([factionKey, c]) => {
-    const f = factions[factionKey];
-    if (!f) return;
-    const lbl = new PIXI.Text(
-      f.short,
-      new PIXI.TextStyle({
-        fontFamily: 'Antonio,Courier New',
-        fontSize: 28,
-        fill: f.color,
-        letterSpacing: 5,
-        fontWeight: '700',
-      }),
-    );
-    lbl.resolution = window.devicePixelRatio * 3;
-    lbl.anchor.set(0.5);
-    lbl.x = c.x / c.n;
-    lbl.y = c.y / c.n;
-    lbl.alpha = 0.18;
-    overlayLayer.addChild(lbl);
-  });
-}
-
-function drawSystems({
-  sysLayer,
-  lblLayer,
-  systems,
-  factions,
-  sysMap,
-  world,
-  activeFactions,
-  onSelect,
-  isSelected,
-}) {
-  systems.forEach((sys) => {
-    const r = RADII[sys.size] || 4;
-    const dot = new PIXI.Graphics();
-    renderNode(dot, sys, r, false, factions);
-    dot.x = sys.x;
-    dot.y = sys.y;
-    dot.eventMode = 'static';
-    dot.cursor = 'pointer';
-    dot.on('pointerover', () => {
-      if (isSelected?.(sys)) return;
-      renderNode(dot, sys, r, true, factions);
-    });
-    dot.on('pointerout', () => {
-      if (isSelected?.(sys)) return;
-      renderNode(dot, sys, r, false, factions);
-    });
-    dot.on('pointerdown', (e) => {
-      e.stopPropagation();
-      onSelect?.(sys, dot, r);
-    });
-
-    if (sys.size === 'minor' || !sys.size) {
-      dot.visible = world.scale.x > 0.7;
-    }
-
-    const lbl = new PIXI.Text(
-      sys.name,
-      new PIXI.TextStyle({
-        fontFamily: 'Antonio,Courier New',
-        fontSize: 12,
-        fill: factions[sys.faction]?.color ?? 0xffffff,
-        letterSpacing: 1.4,
-      }),
-    );
-    lbl.resolution = window.devicePixelRatio * 3;
-    lbl.anchor.set(0, 0.5);
-    lbl.x = sys.x + r + 5;
-    lbl.y = sys.y;
-    lbl.visible = world.scale.x > 0.54 && activeFactions.has(sys.faction);
-
-    sysLayer.addChild(dot);
-    lblLayer.addChild(lbl);
-    sysMap[sys.id] = { dot, lbl, data: sys, r };
-  });
-}
-
-function renderNode(g, sys, r, hover, factions) {
-  const f = factions[sys.faction] || factions.independent;
-  const color = f.color;
-  g.clear();
-
-  if (sys.size === 'capital') {
-    g.beginFill(color, hover ? 0.12 : 0.07).drawEllipse(0, 0, r * 3.2, (r * 3.2) / 0.72).endFill();
-    g.beginFill(color, hover ? 0.28 : 0.18).drawEllipse(0, 0, r * 1.8, (r * 1.8) / 0.72).endFill();
-    g.beginFill(color, hover ? 1.0 : 0.92).drawCircle(0, 0, r).endFill();
-    g.lineStyle(0.6, color, hover ? 0.7 : 0.4);
-    g.drawEllipse(0, 0, r * 2.4, r * 0.9);
-
-    // Orbital dot — travels around the ellipse
-    if (!g._orbitDot) {
-      const orbitDot = new PIXI.Graphics();
-      orbitDot.beginFill(color, 0.9).drawCircle(0, 0, 1.8).endFill();
-      g.addChild(orbitDot);
-
-      // Store reference for animation
-      g._orbitDot = orbitDot;
-    }
-    g._orbitRx = r * 2.4;
-    g._orbitRy = r * 0.9;
-  } else if (sys.size === 'major') {
-    g.beginFill(color, hover ? 0.1 : 0.06).drawEllipse(0, 0, r * 2.6, (r * 2.6) / 0.72).endFill();
-    g.beginFill(color, hover ? 0.25 : 0.15).drawEllipse(0, 0, r * 1.6, (r * 1.6) / 0.72).endFill();
-    g.beginFill(color, hover ? 1.0 : 0.88).drawCircle(0, 0, r).endFill();
-  } else {
-    // Minor — barely visible, only a faint pixel
-    g.beginFill(color, hover ? 0.12 : 0.04).drawCircle(0, 0, r * 1.8).endFill();
-    g.beginFill(color, hover ? 0.7 : 0.22).drawCircle(0, 0, r).endFill();
-  }
-}
-
-function updateLabelsVisibility({ sysMap, world, activeFactions }) {
-  const showMinor = world.scale.x > 0.7;
-  const showLabels = world.scale.x > 0.54;
-  Object.values(sysMap).forEach(({ dot, lbl, data }) => {
-    const factionVisible = activeFactions.has(data.faction);
-    if (data.size === 'minor' || !data.size) {
-      dot.visible = factionVisible && showMinor;
+    if (sys.size === 'capital') {
+      const group = buildCapitalGroup(sys, color, THREE);
+      scene.add(group);
+      capitalMeshes.push(group.userData.core);
+      capitalGroups.push(group);
+      registerFactionObj(fkey, group);
+    } else if (sys.size === 'major') {
+      const group = buildMajorGroup(sys, color, THREE);
+      scene.add(group);
+      majorMeshes.push(group.userData.core);
+      majorData.push(group);
+      registerFactionObj(fkey, group);
     } else {
-      dot.visible = factionVisible;
+      if (!minorByFaction.has(fkey)) minorByFaction.set(fkey, []);
+      minorByFaction.get(fkey).push({ sys, color });
     }
-    lbl.visible = factionVisible && showLabels;
+  }
+
+  for (const [fkey, entries] of minorByFaction.entries()) {
+    const positions = new Float32Array(entries.length * 3);
+    const colors = new Float32Array(entries.length * 3);
+    for (let i = 0; i < entries.length; i++) {
+      const { sys, color } = entries[i];
+      positions[i * 3 + 0] = sys.pos3d.x;
+      positions[i * 3 + 1] = sys.pos3d.y;
+      positions[i * 3 + 2] = sys.pos3d.z;
+      const rgb = hexToRgb(color);
+      colors[i * 3 + 0] = rgb.r;
+      colors[i * 3 + 1] = rgb.g;
+      colors[i * 3 + 2] = rgb.b;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    const mat = new THREE.PointsMaterial({
+      size: 0.05,
+      vertexColors: true,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0.35,
+    });
+    const points = new THREE.Points(geo, mat);
+    scene.add(points);
+    minorMeshByFaction.set(fkey, points);
+    registerFactionObj(fkey, points);
+  }
+
+  const activeFactions = new Set(Object.keys(factions));
+
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  let selectedSystem = null;
+  let selectionWire = null;
+
+  function clearSelectionWire() {
+    if (selectionWire) {
+      scene.remove(selectionWire);
+      selectionWire.geometry.dispose();
+      selectionWire.material.dispose();
+      selectionWire = null;
+    }
+  }
+
+  function drawSelectionWire(mesh, color, baseR) {
+    clearSelectionWire();
+    const geo = new THREE.SphereGeometry(baseR * 1.5, 16, 12);
+    const wire = new THREE.WireframeGeometry(geo);
+    const line = new THREE.LineSegments(
+      wire,
+      new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.7 }),
+    );
+    line.position.copy(mesh.getWorldPosition(new THREE.Vector3()));
+    scene.add(line);
+    selectionWire = line;
+  }
+
+  renderer.domElement.addEventListener('click', (e) => {
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObjects([...capitalMeshes, ...majorMeshes], false);
+    if (!hits.length) return;
+    const mesh = hits[0].object;
+    const sys = mesh.userData.system;
+    if (!sys) return;
+    const faction = factions[sys.faction] || factions.independent;
+    drawSelectionWire(mesh, faction.color, mesh.userData.radius || 0.18);
+    selectedSystem = sys;
+    callbacks.onSelect?.(sys);
   });
+
+  // Pause autoRotate on interaction, resume after idle.
+  let autoRotateTimer = null;
+  function bumpAutoRotate() {
+    controls.autoRotate = false;
+    if (autoRotateTimer) clearTimeout(autoRotateTimer);
+    autoRotateTimer = setTimeout(() => {
+      controls.autoRotate = true;
+    }, AUTOROTATE_RESUME_MS);
+  }
+  renderer.domElement.addEventListener('pointerdown', bumpAutoRotate);
+  renderer.domElement.addEventListener('wheel', bumpAutoRotate, { passive: true });
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // Fly-to state
+  let flyTo = null;
+
+  function startFlyTo(sys) {
+    if (!sys?.pos3d) return;
+    flyTo = {
+      fromTarget: controls.target.clone(),
+      toTarget: new THREE.Vector3(sys.pos3d.x, sys.pos3d.y, sys.pos3d.z),
+      fromCam: camera.position.clone(),
+      toCam: new THREE.Vector3(sys.pos3d.x, sys.pos3d.y, sys.pos3d.z).add(
+        new THREE.Vector3(0, 2, 4),
+      ),
+      t0: performance.now(),
+      dur: 1500,
+    };
+    bumpAutoRotate();
+  }
+
+  function updateFlyTo(now) {
+    if (!flyTo) return;
+    const t = Math.min(1, (now - flyTo.t0) / flyTo.dur);
+    controls.target.lerpVectors(flyTo.fromTarget, flyTo.toTarget, t);
+    camera.position.lerpVectors(flyTo.fromCam, flyTo.toCam, t);
+    if (t >= 1) flyTo = null;
+  }
+
+  function updatePulse(now) {
+    const pulse = 0.75 + Math.sin(now * 0.002) * 0.25;
+    for (const g of capitalGroups) {
+      if (g.userData.bloomInner) g.userData.bloomInner.material.opacity = pulse * 0.6;
+      if (g.userData.bloomOuter) g.userData.bloomOuter.material.opacity = pulse * 0.25;
+    }
+    if (selectionWire) {
+      selectionWire.rotation.y += 0.005;
+    }
+  }
+
+  function updateLabelVisibility() {
+    const camPos = camera.position;
+    const tmp = new THREE.Vector3();
+    for (const g of capitalGroups) {
+      if (!g.userData.label) continue;
+      const dist = camPos.distanceTo(g.getWorldPosition(tmp));
+      g.userData.label.visible = dist < CAPITAL_LABEL_DIST && g.visible;
+    }
+    for (const g of majorData) {
+      if (!g.userData.label) continue;
+      const dist = camPos.distanceTo(g.getWorldPosition(tmp));
+      g.userData.label.visible = dist < MAJOR_LABEL_DIST && g.visible;
+    }
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const now = performance.now();
+    updateFlyTo(now);
+    controls.update();
+    updatePulse(Date.now());
+    updateLabelVisibility();
+    renderer.render(scene, camera);
+    callbacks.onZoomChange?.(camera.position.distanceTo(controls.target));
+  }
+  animate();
+
+  function setFactionVisible(factionKey, visible) {
+    if (visible) activeFactions.add(factionKey);
+    else activeFactions.delete(factionKey);
+
+    const objs = factionObjectsByKey.get(factionKey) || [];
+    for (const obj of objs) obj.visible = visible;
+    const cloud = factionCloudMeshes.get(factionKey);
+    if (cloud) cloud.visible = visible;
+  }
+
+  function flyToSystem(sys) {
+    startFlyTo(sys);
+  }
+
+  function resetView() {
+    flyTo = {
+      fromTarget: controls.target.clone(),
+      toTarget: new THREE.Vector3(0, 0, 0),
+      fromCam: camera.position.clone(),
+      toCam: new THREE.Vector3(0, 40, 60),
+      t0: performance.now(),
+      dur: 900,
+    };
+    bumpAutoRotate();
+  }
+
+  function zoomAtScreen(_sx, _sy, factor) {
+    // Dolly the camera toward/away from the orbit target. `factor > 1` zooms
+    // in (moves camera closer), `factor < 1` zooms out.
+    const dir = new THREE.Vector3().subVectors(camera.position, controls.target);
+    const newDist = Math.min(
+      controls.maxDistance,
+      Math.max(controls.minDistance, dir.length() / factor),
+    );
+    dir.setLength(newDist);
+    camera.position.copy(controls.target).add(dir);
+    bumpAutoRotate();
+  }
+
+  function setSelectedSystem(sysOrNull) {
+    if (sysOrNull === null || sysOrNull === undefined) {
+      clearSelectionWire();
+      selectedSystem = null;
+      callbacks.onSelect?.(null);
+      return;
+    }
+    const mesh = [...capitalMeshes, ...majorMeshes].find(
+      (m) => m.userData.system === sysOrNull || m.userData.system?.id === sysOrNull.id,
+    );
+    if (!mesh) {
+      selectedSystem = sysOrNull;
+      callbacks.onSelect?.(sysOrNull);
+      return;
+    }
+    const faction = factions[sysOrNull.faction] || factions.independent;
+    drawSelectionWire(mesh, faction.color, mesh.userData.radius || 0.18);
+    selectedSystem = sysOrNull;
+    callbacks.onSelect?.(sysOrNull);
+  }
+
+  return {
+    activeFactions,
+    setFactionVisible,
+    setFactionEnabled: setFactionVisible,
+    flyToSystem,
+    flyTo: flyToSystem,
+    resetView,
+    zoomAt: zoomAtScreen,
+    setSelectedSystem,
+    get selectedSystem() {
+      return selectedSystem;
+    },
+  };
 }
 
-function easeInOut(t) {
-  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+// Keep the previous factory name working for any downstream imports.
+export const createMap = initMap;
+
+function buildSkybox(scene, THREE) {
+  const N = 8000;
+  const positions = new Float32Array(N * 3);
+  const colors = new Float32Array(N * 3);
+  const rng = mulberry32(9999);
+
+  for (let i = 0; i < N; i++) {
+    // Uniform points on a sphere of radius 180.
+    const u = rng();
+    const v = rng();
+    const theta = 2 * Math.PI * u;
+    const phi = Math.acos(2 * v - 1);
+    const r = 180;
+    positions[i * 3 + 0] = r * Math.sin(phi) * Math.cos(theta);
+    positions[i * 3 + 1] = r * Math.cos(phi);
+    positions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+
+    const blueish = rng() < 0.12;
+    const alpha = 0.3 + rng() * 0.7;
+    if (blueish) {
+      colors[i * 3 + 0] = 0.7 * alpha;
+      colors[i * 3 + 1] = 0.8 * alpha;
+      colors[i * 3 + 2] = 1.0 * alpha;
+    } else {
+      colors[i * 3 + 0] = alpha;
+      colors[i * 3 + 1] = alpha;
+      colors[i * 3 + 2] = alpha;
+    }
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+  const mat = new THREE.PointsMaterial({
+    vertexColors: true,
+    size: 0.3,
+    sizeAttenuation: true,
+    transparent: true,
+    opacity: 0.8,
+    depthWrite: false,
+  });
+  scene.add(new THREE.Points(geo, mat));
 }
 
+function buildGrid(scene, THREE) {
+  const grid = new THREE.GridHelper(60, 60, 0x112233, 0x0a1520);
+  grid.position.y = -0.1;
+  grid.material.transparent = true;
+  grid.material.opacity = 0.35;
+  scene.add(grid);
+}
+
+function buildFactionClouds(scene, factions, THREE) {
+  const cloudMeshes = new Map();
+  for (const [key, faction] of Object.entries(factions)) {
+    const zone = FACTION_ZONES_3D[key];
+    if (!zone) continue;
+    const N = 200;
+    const positions = new Float32Array(N * 3);
+    const rng = mulberry32(hashString(key + '_cloud'));
+    for (let i = 0; i < N; i++) {
+      positions[i * 3 + 0] = zone.x[0] + rng() * (zone.x[1] - zone.x[0]);
+      positions[i * 3 + 1] = zone.y[0] + rng() * (zone.y[1] - zone.y[0]);
+      positions[i * 3 + 2] = zone.z[0] + rng() * (zone.z[1] - zone.z[0]);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    const mat = new THREE.PointsMaterial({
+      color: faction.color,
+      size: 0.15,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0.08,
+      depthWrite: false,
+    });
+    const points = new THREE.Points(geo, mat);
+    scene.add(points);
+    cloudMeshes.set(key, points);
+  }
+  return cloudMeshes;
+}
+
+function buildCapitalGroup(sys, color, THREE) {
+  const group = new THREE.Group();
+  group.position.set(sys.pos3d.x, sys.pos3d.y, sys.pos3d.z);
+
+  const coreGeo = new THREE.SphereGeometry(0.18, 16, 16);
+  const coreMat = new THREE.MeshBasicMaterial({ color });
+  const core = new THREE.Mesh(coreGeo, coreMat);
+  core.userData = { system: sys, radius: 0.18, factionColor: color };
+  group.add(core);
+
+  const bloomTex = makeBloomTexture(color);
+
+  const bloomInner = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: bloomTex,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      depthWrite: false,
+      opacity: 0.5,
+    }),
+  );
+  bloomInner.scale.set(1.4, 1.4, 1);
+  group.add(bloomInner);
+
+  const bloomOuter = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: bloomTex,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      depthWrite: false,
+      opacity: 0.3,
+    }),
+  );
+  bloomOuter.scale.set(2.8, 2.8, 1);
+  group.add(bloomOuter);
+
+  const ringGeo = new THREE.RingGeometry(0.28, 0.32, 32);
+  const ringMat = new THREE.MeshBasicMaterial({
+    color,
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.5,
+    depthWrite: false,
+  });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = (75 * Math.PI) / 180;
+  group.add(ring);
+
+  const label = makeLabelSprite(sys.name || 'Unknown');
+  label.position.set(0, 0.6, 0);
+  label.visible = false;
+  group.add(label);
+
+  group.userData = {
+    system: sys,
+    core,
+    bloomInner,
+    bloomOuter,
+    ring,
+    label,
+  };
+
+  return group;
+}
+
+function buildMajorGroup(sys, color, THREE) {
+  const group = new THREE.Group();
+  group.position.set(sys.pos3d.x, sys.pos3d.y, sys.pos3d.z);
+
+  const coreGeo = new THREE.SphereGeometry(0.1, 10, 10);
+  const dimColor = dimHex(color, 0.75);
+  const coreMat = new THREE.MeshBasicMaterial({ color: dimColor });
+  const core = new THREE.Mesh(coreGeo, coreMat);
+  core.userData = { system: sys, radius: 0.1, factionColor: color };
+  group.add(core);
+
+  const bloom = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: makeBloomTexture(color),
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      depthWrite: false,
+      opacity: 0.45,
+    }),
+  );
+  bloom.scale.set(1.0, 1.0, 1);
+  group.add(bloom);
+
+  const label = makeLabelSprite(sys.name || 'Unknown');
+  label.position.set(0, 0.35, 0);
+  label.visible = false;
+  group.add(label);
+
+  group.userData = { system: sys, core, label };
+
+  return group;
+}
+
+function dimHex(hex, amount) {
+  const r = Math.round(((hex >> 16) & 0xff) * amount);
+  const g = Math.round(((hex >> 8) & 0xff) * amount);
+  const b = Math.round((hex & 0xff) * amount);
+  return (r << 16) | (g << 8) | b;
+}

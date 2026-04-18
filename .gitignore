@@ -26,6 +26,10 @@ Thumbs.db
 # Re-downloadable HYG star database gzip dump (~33 MB)
 scripts/cache/hyg_v42.csv
 
+# Playwright MCP + local verification screenshots
+.playwright-mcp/
+galaxy-*.png
+
 # Logs
 logs
 *.log
