@@ -161,7 +161,7 @@ export async function initMap(systems, factions, callbacks = {}) {
   controls.dampingFactor = 0.08;
   controls.autoRotate = true;
   controls.autoRotateSpeed = 0.15;
-  controls.minDistance = 0.3;
+  controls.minDistance = 0.1;
   controls.maxDistance = 80;
   controls.target.set(0, 0, 0);
 
@@ -393,27 +393,39 @@ export async function initMap(systems, factions, callbacks = {}) {
     bumpAutoRotate();
   }
 
-  // Scales the camera-to-target distance. `factor > 1` zooms in.
   // OrbitControls r128 keeps dollyIn/dollyOut as private closures, so we
-  // adjust the camera position directly and clamp to the control distances.
-  function zoomByFactor(factor) {
-    const dir = new THREE.Vector3().subVectors(camera.position, controls.target);
-    const newDist = Math.min(
-      controls.maxDistance,
-      Math.max(controls.minDistance, dir.length() / factor),
-    );
-    dir.setLength(newDist);
-    camera.position.copy(controls.target).add(dir);
+  // step the camera toward/away from the target directly and clamp to the
+  // control distance range.
+  function zoomIn() {
+    const dir = new THREE.Vector3()
+      .subVectors(camera.position, controls.target)
+      .multiplyScalar(1 - 1 / 1.4);
+    camera.position.sub(dir);
+    const dist = camera.position.distanceTo(controls.target);
+    if (dist < controls.minDistance) {
+      camera.position.copy(controls.target).addScaledVector(
+        new THREE.Vector3().subVectors(camera.position, controls.target).normalize(),
+        controls.minDistance,
+      );
+    }
     controls.update();
     bumpAutoRotate();
   }
 
-  function zoomIn() {
-    zoomByFactor(1.3);
-  }
-
   function zoomOut() {
-    zoomByFactor(1 / 1.3);
+    const dir = new THREE.Vector3()
+      .subVectors(camera.position, controls.target)
+      .multiplyScalar(1 - 1 / 1.4);
+    camera.position.add(dir);
+    const dist = camera.position.distanceTo(controls.target);
+    if (dist > controls.maxDistance) {
+      camera.position.copy(controls.target).addScaledVector(
+        new THREE.Vector3().subVectors(camera.position, controls.target).normalize(),
+        controls.maxDistance,
+      );
+    }
+    controls.update();
+    bumpAutoRotate();
   }
 
   function zoomAtScreen(_sx, _sy, factor) {
@@ -492,12 +504,13 @@ function buildSkybox(scene, THREE, starTex) {
   const rng = mulberry32(9999);
 
   for (let i = 0; i < N; i++) {
-    // Uniform points on a sphere of radius 180.
+    // Uniform points on a sphere of radius 300 — must stay outside the
+    // camera's maxDistance (80) so the sphere never inverts on the viewer.
     const u = rng();
     const v = rng();
     const theta = 2 * Math.PI * u;
     const phi = Math.acos(2 * v - 1);
-    const r = 180;
+    const r = 300;
     positions[i * 3 + 0] = r * Math.sin(phi) * Math.cos(theta);
     positions[i * 3 + 1] = r * Math.cos(phi);
     positions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
@@ -531,7 +544,9 @@ function buildSkybox(scene, THREE, starTex) {
     alphaTest: 0.01,
   });
   const skybox = new THREE.Points(geo, mat);
-  skybox.renderOrder = -1;
+  skybox.renderOrder = -2;
+  skybox.material.depthWrite = false;
+  skybox.material.depthTest = false;
   skybox.frustumCulled = false;
   scene.add(skybox);
 }
