@@ -121,6 +121,22 @@ body {
 .faction-btn.off { opacity: 0.28; }
 .faction-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
 
+.faction-3d-btn {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid rgba(255,153,0,.3);
+  border-radius: 4px;
+  color: rgba(255,153,0,.6);
+  font-family: 'Antonio', sans-serif;
+  font-size: 10px; letter-spacing: .12em;
+  padding: 2px 7px; cursor: pointer;
+  transition: all .15s;
+}
+.faction-3d-btn:hover {
+  background: rgba(255,153,0,.12);
+  color: #FF9900;
+}
+
 /* ── INFO PANEL ───────────────────────────────────────────── */
 #info-panel {
   position: fixed;

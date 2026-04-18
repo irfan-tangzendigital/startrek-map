@@ -1,0 +1,33 @@
+#sector-view {
+  position: fixed; inset: 0;
+  background: #00000F;
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+}
+#sector-view.open { display: flex; }
+#sector-view canvas { flex: 1; display: block; }
+#sector-view-header {
+  position: absolute; top: 16px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Antonio', sans-serif;
+  font-size: 13px; letter-spacing: .2em;
+  color: rgba(255,204,136,0.5);
+  text-transform: uppercase; pointer-events: none;
+}
+#sector-view-close {
+  position: absolute; top: 14px; right: 16px;
+  background: rgba(0,3,22,.92);
+  border: 1px solid rgba(255,153,0,.35);
+  border-radius: 7px;
+  color: #FFCC88; font-family: 'Antonio', sans-serif;
+  font-size: 11px; letter-spacing: .14em;
+  padding: 8px 16px; cursor: pointer;
+}
+#sector-view-faction-label {
+  position: absolute; bottom: 24px; left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Antonio', sans-serif;
+  font-size: 28px; font-weight: 700; letter-spacing: .1em;
+  opacity: 0.12; pointer-events: none;
+}

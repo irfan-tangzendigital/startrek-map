@@ -3,6 +3,7 @@ import factionsArray from './data/factions.json';
 import systems from './data/systems.json';
 import { createMap } from './map.js';
 import { initUI } from './ui.js';
+import { initSectorView } from './sector-view.js';
 
 const factions = Object.fromEntries(
   factionsArray.map((f) => [
@@ -27,3 +28,5 @@ const map = createMap({
 });
 
 ui = initUI({ map, factions, systems });
+
+initSectorView(systems, factions);

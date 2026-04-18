@@ -1,3 +1,5 @@
+import { openSectorView } from './sector-view.js';
+
 export function initUI({ map, factions, systems }) {
   const infoPanel = document.getElementById('info-panel');
   const closeBtn = document.getElementById('info-close');
@@ -118,6 +120,17 @@ function buildFactionFilters({ map, factions }) {
       map.setFactionEnabled(id, !enabled);
       btn.classList.toggle('off', enabled);
     });
+
+    const btn3d = document.createElement('button');
+    btn3d.className = 'faction-3d-btn';
+    btn3d.type = 'button';
+    btn3d.textContent = '3D';
+    btn3d.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openSectorView(id, (sys) => map.setSelectedSystem(sys));
+    });
+    btn.appendChild(btn3d);
+
     list.appendChild(btn);
   });
 }
