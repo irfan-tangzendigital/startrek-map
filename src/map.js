@@ -520,10 +520,12 @@ function buildSkybox(scene, THREE, starTex) {
   starGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   starGeo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
-  // sizeAttenuation: false keeps each star a constant pixel size regardless
-  // of camera distance, so the starfield reads like a real sky at any zoom.
+  // sizeAttenuation: false makes `size` a raw gl_PointSize in GPU pixels,
+  // so stars stay a constant screen size at every zoom level. 0.8 px was
+  // subpixel on most displays (WebGL drops those), so 2 px gives a reliably
+  // visible dot that still reads like a distant star.
   const starMat = new THREE.PointsMaterial({
-    size: 0.8,
+    size: 2,
     vertexColors: true,
     map: starTex,
     alphaTest: 0.01,
