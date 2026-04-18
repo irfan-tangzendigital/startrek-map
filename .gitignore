@@ -23,6 +23,9 @@ Thumbs.db
 # scripts/cache/stapi_raw.json  ← keeps pipeline from re-fetching on every build
 # scripts/overrides.json        ← hand-authored enrichment, must be versioned
 
+# Re-downloadable HYG star database gzip dump (~33 MB)
+scripts/cache/hyg_v42.csv
+
 # Logs
 logs
 *.log

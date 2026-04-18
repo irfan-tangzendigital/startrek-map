@@ -258,9 +258,18 @@
     "uid": "ASMA0000009474",
     "name": "Aldebaran",
     "astronomicalObjectType": "STAR_SYSTEM",
-    "quadrant": "Alpha Quadrant",
-    "x": 1081,
-    "y": 276
+    "location": {
+      "uid": "ASMA0000025892",
+      "name": "Alpha Quadrant"
+    },
+    "hyg3d": {
+      "x": 1.405444,
+      "y": 1.1613322,
+      "z": 3.6575208000000003
+    },
+    "hyg_source": "Alpha Tauri, 65 ly",
+    "x": 1983,
+    "y": 291
   },
   {
     "uid": "ASMA0000009476",
@@ -834,9 +843,18 @@
     "uid": "ASMA0000212578",
     "name": "Arcturus",
     "astronomicalObjectType": "STAR_SYSTEM",
-    "quadrant": "Alpha Quadrant",
-    "x": 592,
-    "y": 571
+    "location": {
+      "uid": "ASMA0000025892",
+      "name": "Alpha Quadrant"
+    },
+    "hyg3d": {
+      "x": -1.7646896,
+      "y": 0.7397876,
+      "z": -1.1865062
+    },
+    "hyg_source": "Alpha Bootis, 37 ly",
+    "x": 1095,
+    "y": 577
   },
   {
     "uid": "ASMA0000012543",
@@ -2410,9 +2428,18 @@
     "uid": "ASMA0000010991",
     "name": "Canopus",
     "astronomicalObjectType": "STAR_SYSTEM",
-    "quadrant": "Beta Quadrant",
-    "x": 1792,
-    "y": 1098
+    "location": {
+      "uid": "ASMA0000002015",
+      "name": "Beta Quadrant"
+    },
+    "hyg3d": {
+      "x": -1.1985358,
+      "y": -15.079221,
+      "z": 11.426406799999999
+    },
+    "hyg_source": "Alpha Carinae, 310 ly",
+    "x": 1276,
+    "y": 1090
   },
   {
     "uid": "ASMA0000011026",
@@ -2442,9 +2469,18 @@
     "uid": "ASMA0000010998",
     "name": "Capella",
     "astronomicalObjectType": "STAR_SYSTEM",
-    "quadrant": "Alpha Quadrant",
-    "x": 120,
-    "y": 188
+    "location": {
+      "uid": "ASMA0000025892",
+      "name": "Alpha Quadrant"
+    },
+    "hyg3d": {
+      "x": 0.3425266,
+      "y": 1.8880013999999998,
+      "z": 1.7908878000000001
+    },
+    "hyg_source": "Alpha Aurigae, 43 ly",
+    "x": 236,
+    "y": 205
   },
   {
     "uid": "ASMA0000009295",
@@ -3296,17 +3332,35 @@
     "uid": "ASMA0000001921",
     "name": "Deneb",
     "astronomicalObjectType": "STAR_SYSTEM",
-    "quadrant": "Alpha Quadrant",
-    "x": 813,
-    "y": 1245
+    "location": {
+      "uid": "ASMA0000025892",
+      "name": "Alpha Quadrant"
+    },
+    "hyg3d": {
+      "x": 39.4501264,
+      "y": 61.52016640000001,
+      "z": -46.4226814
+    },
+    "hyg_source": "Alpha Cygni, 2600 ly",
+    "x": 1497,
+    "y": 1232
   },
   {
     "uid": "ASMA0000264562",
     "name": "Deneb",
     "astronomicalObjectType": "STAR_SYSTEM",
-    "quadrant": "Alpha Quadrant",
-    "x": 232,
-    "y": 607
+    "location": {
+      "uid": "ASMA0000025892",
+      "name": "Alpha Quadrant"
+    },
+    "hyg3d": {
+      "x": 39.4501264,
+      "y": 61.52016640000001,
+      "z": -46.4226814
+    },
+    "hyg_source": "Alpha Cygni, 2600 ly",
+    "x": 440,
+    "y": 612
   },
   {
     "uid": "ASMA0000007550",
@@ -3404,7 +3458,13 @@
     ],
     "shows": [
       "ENT"
-    ]
+    ],
+    "hyg3d": {
+      "x": 0.3465178,
+      "y": -0.6060614,
+      "z": -0.193343
+    },
+    "hyg_source": "Epsilon Indi, 11.8 ly"
   },
   {
     "uid": "ASMA0000038738",
@@ -3954,9 +4014,18 @@
     "uid": "ASMA0000052603",
     "name": "Epsilon Eridani",
     "astronomicalObjectType": "STAR_SYSTEM",
-    "quadrant": "Alpha Quadrant",
-    "x": 402,
-    "y": 1379
+    "location": {
+      "uid": "ASMA0000025892",
+      "name": "Alpha Quadrant"
+    },
+    "hyg3d": {
+      "x": 0.379794,
+      "y": -0.1057046,
+      "z": 0.5082852
+    },
+    "hyg_source": "Epsilon Eridani, 10.5 ly",
+    "x": 748,
+    "y": 1363
   },
   {
     "uid": "ASMA0000289006",
@@ -10571,9 +10640,18 @@
     "uid": "ASMA0000005711",
     "name": "Sirius",
     "astronomicalObjectType": "STAR_SYSTEM",
-    "quadrant": "Alpha Quadrant",
-    "x": 468,
-    "y": 780
+    "location": {
+      "uid": "ASMA0000025892",
+      "name": "Alpha Quadrant"
+    },
+    "hyg3d": {
+      "x": -0.0988646,
+      "y": -0.151697,
+      "z": 0.4953462
+    },
+    "hyg_source": "Alpha Canis Majoris, 8.6 ly",
+    "x": 869,
+    "y": 781
   },
   {
     "uid": "ASMA0000000546",
@@ -10671,7 +10749,13 @@
       "PIC",
       "SNW",
       "DSC"
-    ]
+    ],
+    "hyg3d": {
+      "x": 0.0000010000000000000002,
+      "y": 0,
+      "z": 0
+    },
+    "hyg_source": "Our Sun"
   },
   {
     "uid": "ASMA0000029407",
@@ -11322,9 +11406,18 @@
     "uid": "ASMA0000147895",
     "name": "Tau Ceti",
     "astronomicalObjectType": "STAR_SYSTEM",
-    "quadrant": "Alpha Quadrant",
-    "x": 660,
-    "y": 1458
+    "location": {
+      "uid": "ASMA0000025892",
+      "name": "Alpha Quadrant"
+    },
+    "hyg3d": {
+      "x": 0.6308166,
+      "y": -0.200452,
+      "z": 0.3079016
+    },
+    "hyg_source": "HD 10700, 11.9 ly",
+    "x": 1218,
+    "y": 1440
   },
   {
     "uid": "ASMA0000165399",
@@ -11467,7 +11560,13 @@
       "TOS",
       "ENT",
       "SNW"
-    ]
+    ],
+    "hyg3d": {
+      "x": 0.3972546,
+      "y": 0.4377484,
+      "z": -0.3739578
+    },
+    "hyg_source": "61 Cygni A, 11.4 ly"
   },
   {
     "uid": "ASMA0000229694",
@@ -12366,9 +12465,18 @@
     "uid": "ASMA0000003610",
     "name": "Vega",
     "astronomicalObjectType": "STAR_SYSTEM",
-    "quadrant": "Alpha Quadrant",
-    "x": 236,
-    "y": 194
+    "location": {
+      "uid": "ASMA0000025892",
+      "name": "Alpha Quadrant"
+    },
+    "hyg3d": {
+      "x": 0.192113,
+      "y": 0.9619462000000001,
+      "z": -1.1816018
+    },
+    "hyg_source": "Alpha Lyrae, 25 ly",
+    "x": 447,
+    "y": 211
   },
   {
     "uid": "ASMA0000013225",

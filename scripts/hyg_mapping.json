@@ -1,0 +1,20 @@
+{
+  "Sol system":        { "match": "proper", "value": "Sol",              "note": "Our Sun" },
+  "Vulcan":            { "match": "bf",     "value": "40Omi2Eri",        "note": "40 Eridani A, 16.5 ly" },
+  "Wolf 359":          { "match": "proper", "value": "Wolf 359",         "note": "CN Leonis, 7.8 ly" },
+  "Tellar Prime":      { "match": "bf",     "value": "61Cyg",            "note": "61 Cygni A, 11.4 ly" },
+  "Andoria":           { "match": "proper", "value": "Procyon",          "note": "Procyon A, 11.4 ly" },
+  "Denobula":          { "match": "bf",     "value": "Eps Ind",          "note": "Epsilon Indi, 11.8 ly" },
+  "Aldebaran":         { "match": "proper", "value": "Aldebaran",        "note": "Alpha Tauri, 65 ly" },
+  "Altair":            { "match": "proper", "value": "Altair",           "note": "Alpha Aquilae, 16.7 ly" },
+  "Arcturus":          { "match": "proper", "value": "Arcturus",         "note": "Alpha Bootis, 37 ly" },
+  "Rigel":             { "match": "proper", "value": "Rigel",            "note": "Beta Orionis, 860 ly" },
+  "Deneb":             { "match": "proper", "value": "Deneb",            "note": "Alpha Cygni, 2600 ly" },
+  "Sirius":            { "match": "proper", "value": "Sirius",           "note": "Alpha Canis Majoris, 8.6 ly" },
+  "Tau Ceti":          { "match": "bf",     "value": "52TauCet",         "note": "HD 10700, 11.9 ly" },
+  "Epsilon Eridani":   { "match": "proper", "value": "Ran",              "note": "Epsilon Eridani, 10.5 ly" },
+  "Vega":              { "match": "proper", "value": "Vega",             "note": "Alpha Lyrae, 25 ly" },
+  "Pollux":            { "match": "proper", "value": "Pollux",           "note": "Beta Geminorum, 34 ly" },
+  "Capella":           { "match": "proper", "value": "Capella",          "note": "Alpha Aurigae, 43 ly" },
+  "Canopus":           { "match": "proper", "value": "Canopus",          "note": "Alpha Carinae, 310 ly" }
+}

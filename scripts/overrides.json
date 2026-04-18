@@ -99,7 +99,13 @@
       "PIC",
       "SNW",
       "DSC"
-    ]
+    ],
+    "hyg3d": {
+      "x": 0.0000010000000000000002,
+      "y": 0,
+      "z": 0
+    },
+    "hyg_source": "Our Sun"
   },
   "Vulcan": {
     "id": "vulcan",
@@ -144,7 +150,13 @@
       "DSC",
       "SNW",
       "PIC"
-    ]
+    ],
+    "hyg3d": {
+      "x": 0.4359048,
+      "y": -0.132748,
+      "z": 0.8865788
+    },
+    "hyg_source": "40 Eridani A, 16.5 ly"
   },
   "Andoria": {
     "id": "andoria",
@@ -180,7 +192,13 @@
       "ENT",
       "DSC",
       "SNW"
-    ]
+    ],
+    "hyg3d": {
+      "x": -0.29386239999999997,
+      "y": 0.0640048,
+      "z": 0.635234
+    },
+    "hyg_source": "Procyon A, 11.4 ly"
   },
   "Betazed": {
     "id": "betazed",
@@ -282,7 +300,13 @@
       "TOS",
       "ENT",
       "SNW"
-    ]
+    ],
+    "hyg3d": {
+      "x": 0.3972546,
+      "y": 0.4377484,
+      "z": -0.3739578
+    },
+    "hyg_source": "61 Cygni A, 11.4 ly"
   },
   "Denobula": {
     "id": "denobula",
@@ -309,7 +333,13 @@
     ],
     "shows": [
       "ENT"
-    ]
+    ],
+    "hyg3d": {
+      "x": 0.3465178,
+      "y": -0.6060614,
+      "z": -0.193343
+    },
+    "hyg_source": "Epsilon Indi, 11.8 ly"
   },
   "Wolf 359": {
     "id": "wolf359",
@@ -343,7 +373,13 @@
     "shows": [
       "TNG",
       "DS9"
-    ]
+    ],
+    "hyg3d": {
+      "x": -0.45656220000000003,
+      "y": 0.0584114,
+      "z": 0.1298668
+    },
+    "hyg_source": "CN Leonis, 7.8 ly"
   },
   "Risa": {
     "id": "risa",
@@ -907,5 +943,101 @@
     "shows": [
       "TNG Films"
     ]
+  },
+  "Aldebaran": {
+    "hyg3d": {
+      "x": 1.405444,
+      "y": 1.1613322,
+      "z": 3.6575208000000003
+    },
+    "hyg_source": "Alpha Tauri, 65 ly"
+  },
+  "Altair": {
+    "hyg3d": {
+      "x": 0.4710936,
+      "y": 0.1581498,
+      "z": -0.89746
+    },
+    "hyg_source": "Alpha Aquilae, 16.7 ly"
+  },
+  "Arcturus": {
+    "hyg3d": {
+      "x": -1.7646896,
+      "y": 0.7397876,
+      "z": -1.1865062
+    },
+    "hyg_source": "Alpha Bootis, 37 ly"
+  },
+  "Rigel": {
+    "hyg3d": {
+      "x": 10.3202212,
+      "y": -7.5480102,
+      "z": 51.341981
+    },
+    "hyg_source": "Beta Orionis, 860 ly"
+  },
+  "Deneb": {
+    "hyg3d": {
+      "x": 39.4501264,
+      "y": 61.52016640000001,
+      "z": -46.4226814
+    },
+    "hyg_source": "Alpha Cygni, 2600 ly"
+  },
+  "Sirius": {
+    "hyg3d": {
+      "x": -0.0988646,
+      "y": -0.151697,
+      "z": 0.4953462
+    },
+    "hyg_source": "Alpha Canis Majoris, 8.6 ly"
+  },
+  "Epsilon Eridani": {
+    "hyg3d": {
+      "x": 0.379794,
+      "y": -0.1057046,
+      "z": 0.5082852
+    },
+    "hyg_source": "Epsilon Eridani, 10.5 ly"
+  },
+  "Vega": {
+    "hyg3d": {
+      "x": 0.192113,
+      "y": 0.9619462000000001,
+      "z": -1.1816018
+    },
+    "hyg_source": "Alpha Lyrae, 25 ly"
+  },
+  "Pollux": {
+    "hyg3d": {
+      "x": -0.811093,
+      "y": 0.9734342,
+      "z": 1.6390360000000002
+    },
+    "hyg_source": "Beta Geminorum, 34 ly"
+  },
+  "Capella": {
+    "hyg3d": {
+      "x": 0.3425266,
+      "y": 1.8880013999999998,
+      "z": 1.7908878000000001
+    },
+    "hyg_source": "Alpha Aurigae, 43 ly"
+  },
+  "Canopus": {
+    "hyg3d": {
+      "x": -1.1985358,
+      "y": -15.079221,
+      "z": 11.426406799999999
+    },
+    "hyg_source": "Alpha Carinae, 310 ly"
+  },
+  "Tau Ceti": {
+    "hyg3d": {
+      "x": 0.6308166,
+      "y": -0.200452,
+      "z": 0.3079016
+    },
+    "hyg_source": "HD 10700, 11.9 ly"
   }
 }
