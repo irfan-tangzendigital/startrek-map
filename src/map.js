@@ -505,10 +505,14 @@ function buildSkybox(scene, THREE, starTex) {
     transparent: true,
     opacity: 0.8,
     depthWrite: false,
+    depthTest: false,
     map: starTex,
     alphaTest: 0.01,
   });
-  scene.add(new THREE.Points(geo, mat));
+  const skybox = new THREE.Points(geo, mat);
+  skybox.renderOrder = -1;
+  skybox.frustumCulled = false;
+  scene.add(skybox);
 }
 
 function buildGrid(scene, THREE) {
@@ -537,10 +541,10 @@ function buildFactionClouds(scene, factions, THREE, starTex) {
 
     const innerMat = new THREE.PointsMaterial({
       color: faction.color,
-      size: 0.25,
+      size: 0.20,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.18,
+      opacity: 0.10,
       depthWrite: false,
       map: starTex,
       alphaTest: 0.01,
@@ -551,10 +555,10 @@ function buildFactionClouds(scene, factions, THREE, starTex) {
     // Soft outer halo — fewer visual points but each is large and faint.
     const outerMat = new THREE.PointsMaterial({
       color: faction.color,
-      size: 0.8,
+      size: 0.6,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.06,
+      opacity: 0.04,
       depthWrite: false,
       map: starTex,
       alphaTest: 0.01,
