@@ -154,7 +154,7 @@ export async function initMap(systems, factions, callbacks = {}) {
     0.01,
     2000,
   );
-  camera.position.set(0, 55, 85);
+  camera.position.set(0, 45, 70);
 
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
@@ -162,7 +162,7 @@ export async function initMap(systems, factions, callbacks = {}) {
   controls.autoRotate = true;
   controls.autoRotateSpeed = 0.15;
   controls.minDistance = 0.05;
-  controls.maxDistance = 80;
+  controls.maxDistance = 150;
   controls.target.set(0, 0, 0);
 
   const starTex = makeStarTexture(THREE);
@@ -387,7 +387,7 @@ export async function initMap(systems, factions, callbacks = {}) {
 
   function resetView() {
     flyTo = null;
-    camera.position.set(0, 55, 85);
+    camera.position.set(0, 45, 70);
     controls.target.set(0, 0, 0);
     controls.update();
     bumpAutoRotate();
