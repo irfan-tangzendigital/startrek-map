@@ -97,23 +97,30 @@ function makeBloomTexture(hex) {
 
 function makeLabelSprite(text) {
   const THREE = window.THREE;
-  const pad = 16;
+  const pad = 24;
   const fontSize = 48;
+  const h = 128;
   const measureCtx = document.createElement('canvas').getContext('2d');
   measureCtx.font = `${fontSize}px Antonio, sans-serif`;
-  const w = Math.ceil(measureCtx.measureText(text).width) + pad * 2;
-  const h = fontSize + pad * 2;
+  const measured = Math.ceil(measureCtx.measureText(text).width);
+  // 512 × 128 minimum — enough resolution for crisp rendering at close zoom.
+  // Grows wider for long names so the 48px glyphs never get scaled down.
+  const w = Math.max(512, measured + pad * 2);
+
   const canvas = document.createElement('canvas');
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext('2d');
   ctx.font = `${fontSize}px Antonio, sans-serif`;
+  ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
-  ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-  ctx.shadowBlur = 8;
-  ctx.fillText(text, pad, h / 2);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+  ctx.shadowBlur = 10;
+  ctx.fillText(text, w / 2, h / 2);
+
   const tex = new THREE.CanvasTexture(canvas);
+  tex.anisotropy = 4;
   tex.needsUpdate = true;
   const mat = new THREE.SpriteMaterial({
     map: tex,
@@ -122,7 +129,7 @@ function makeLabelSprite(text) {
     depthTest: false,
   });
   const sprite = new THREE.Sprite(mat);
-  const scaleFactor = 0.006;
+  const scaleFactor = 0.003;
   sprite.scale.set(w * scaleFactor, h * scaleFactor, 1);
   sprite.userData.sizeCanvas = { w, h };
   return sprite;
@@ -133,7 +140,7 @@ export async function initMap(systems, factions, callbacks = {}) {
   const THREE = window.THREE;
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0x00000f);
   const mount = document.getElementById('app');
@@ -158,9 +165,10 @@ export async function initMap(systems, factions, callbacks = {}) {
   controls.maxDistance = 120;
   controls.target.set(0, 0, 0);
 
-  buildSkybox(scene, THREE);
+  const starTex = makeStarTexture(THREE);
+  buildSkybox(scene, THREE, starTex);
   buildGrid(scene, THREE);
-  const factionCloudMeshes = buildFactionClouds(scene, factions, THREE);
+  const factionCloudMeshes = buildFactionClouds(scene, factions, THREE, starTex);
 
   const capitalMeshes = [];
   const majorMeshes = [];
@@ -219,11 +227,14 @@ export async function initMap(systems, factions, callbacks = {}) {
     geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
     const mat = new THREE.PointsMaterial({
-      size: 0.05,
+      size: 0.08,
       vertexColors: true,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.35,
+      opacity: 0.55,
+      map: starTex,
+      alphaTest: 0.01,
+      depthWrite: false,
     });
     const points = new THREE.Points(geo, mat);
     scene.add(points);
@@ -364,8 +375,10 @@ export async function initMap(systems, factions, callbacks = {}) {
 
     const objs = factionObjectsByKey.get(factionKey) || [];
     for (const obj of objs) obj.visible = visible;
-    const cloud = factionCloudMeshes.get(factionKey);
-    if (cloud) cloud.visible = visible;
+    const cloudLayers = factionCloudMeshes.get(factionKey);
+    if (cloudLayers) {
+      for (const layer of cloudLayers) layer.visible = visible;
+    }
   }
 
   function flyToSystem(sys) {
@@ -436,7 +449,22 @@ export async function initMap(systems, factions, callbacks = {}) {
 // Keep the previous factory name working for any downstream imports.
 export const createMap = initMap;
 
-function buildSkybox(scene, THREE) {
+function makeStarTexture(THREE) {
+  const c = document.createElement('canvas');
+  c.width = c.height = 32;
+  const ctx = c.getContext('2d');
+  const g = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+  g.addColorStop(0, 'rgba(255,255,255,1)');
+  g.addColorStop(0.4, 'rgba(255,255,255,0.8)');
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, 32, 32);
+  const tex = new THREE.CanvasTexture(c);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+function buildSkybox(scene, THREE, starTex) {
   const N = 8000;
   const positions = new Float32Array(N * 3);
   const colors = new Float32Array(N * 3);
@@ -477,24 +505,26 @@ function buildSkybox(scene, THREE) {
     transparent: true,
     opacity: 0.8,
     depthWrite: false,
+    map: starTex,
+    alphaTest: 0.01,
   });
   scene.add(new THREE.Points(geo, mat));
 }
 
 function buildGrid(scene, THREE) {
-  const grid = new THREE.GridHelper(60, 60, 0x112233, 0x0a1520);
+  const grid = new THREE.GridHelper(60, 30, 0x1a3a5c, 0x0d1f30);
   grid.position.y = -0.1;
   grid.material.transparent = true;
-  grid.material.opacity = 0.35;
+  grid.material.opacity = 0.55;
   scene.add(grid);
 }
 
-function buildFactionClouds(scene, factions, THREE) {
+function buildFactionClouds(scene, factions, THREE, starTex) {
   const cloudMeshes = new Map();
   for (const [key, faction] of Object.entries(factions)) {
     const zone = FACTION_ZONES_3D[key];
     if (!zone) continue;
-    const N = 200;
+    const N = 400;
     const positions = new Float32Array(N * 3);
     const rng = mulberry32(hashString(key + '_cloud'));
     for (let i = 0; i < N; i++) {
@@ -504,17 +534,35 @@ function buildFactionClouds(scene, factions, THREE) {
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    const mat = new THREE.PointsMaterial({
+
+    const innerMat = new THREE.PointsMaterial({
       color: faction.color,
-      size: 0.15,
+      size: 0.25,
       sizeAttenuation: true,
       transparent: true,
-      opacity: 0.08,
+      opacity: 0.18,
       depthWrite: false,
+      map: starTex,
+      alphaTest: 0.01,
     });
-    const points = new THREE.Points(geo, mat);
-    scene.add(points);
-    cloudMeshes.set(key, points);
+    const inner = new THREE.Points(geo, innerMat);
+    scene.add(inner);
+
+    // Soft outer halo — fewer visual points but each is large and faint.
+    const outerMat = new THREE.PointsMaterial({
+      color: faction.color,
+      size: 0.8,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0.06,
+      depthWrite: false,
+      map: starTex,
+      alphaTest: 0.01,
+    });
+    const outer = new THREE.Points(geo, outerMat);
+    scene.add(outer);
+
+    cloudMeshes.set(key, [inner, outer]);
   }
   return cloudMeshes;
 }

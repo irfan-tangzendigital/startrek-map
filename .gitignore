@@ -29,6 +29,7 @@ scripts/cache/hyg_v42.csv
 # Playwright MCP + local verification screenshots
 .playwright-mcp/
 galaxy-*.png
+fix-*.png
 
 # Logs
 logs
