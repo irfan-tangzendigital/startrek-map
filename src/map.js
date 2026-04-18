@@ -161,8 +161,8 @@ export async function initMap(systems, factions, callbacks = {}) {
   controls.dampingFactor = 0.08;
   controls.autoRotate = true;
   controls.autoRotateSpeed = 0.15;
-  controls.minDistance = 0.5;
-  controls.maxDistance = 120;
+  controls.minDistance = 0.3;
+  controls.maxDistance = 80;
   controls.target.set(0, 0, 0);
 
   const starTex = makeStarTexture(THREE);
@@ -386,15 +386,34 @@ export async function initMap(systems, factions, callbacks = {}) {
   }
 
   function resetView() {
-    flyTo = {
-      fromTarget: controls.target.clone(),
-      toTarget: new THREE.Vector3(0, 0, 0),
-      fromCam: camera.position.clone(),
-      toCam: new THREE.Vector3(0, 40, 60),
-      t0: performance.now(),
-      dur: 900,
-    };
+    flyTo = null;
+    camera.position.set(0, 40, 60);
+    controls.target.set(0, 0, 0);
+    controls.update();
     bumpAutoRotate();
+  }
+
+  // Scales the camera-to-target distance. `factor > 1` zooms in.
+  // OrbitControls r128 keeps dollyIn/dollyOut as private closures, so we
+  // adjust the camera position directly and clamp to the control distances.
+  function zoomByFactor(factor) {
+    const dir = new THREE.Vector3().subVectors(camera.position, controls.target);
+    const newDist = Math.min(
+      controls.maxDistance,
+      Math.max(controls.minDistance, dir.length() / factor),
+    );
+    dir.setLength(newDist);
+    camera.position.copy(controls.target).add(dir);
+    controls.update();
+    bumpAutoRotate();
+  }
+
+  function zoomIn() {
+    zoomByFactor(1.3);
+  }
+
+  function zoomOut() {
+    zoomByFactor(1 / 1.3);
   }
 
   function zoomAtScreen(_sx, _sy, factor) {
@@ -438,6 +457,8 @@ export async function initMap(systems, factions, callbacks = {}) {
     flyToSystem,
     flyTo: flyToSystem,
     resetView,
+    zoomIn,
+    zoomOut,
     zoomAt: zoomAtScreen,
     setSelectedSystem,
     get selectedSystem() {

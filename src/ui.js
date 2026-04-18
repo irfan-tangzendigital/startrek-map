@@ -7,8 +7,12 @@ export function initUI({ map, factions, systems }) {
   const coordsLabel = document.getElementById('coords');
 
   const ui = {
-    setZoomLabel(scale) {
-      zoomLabel.textContent = `${Math.round(scale * 100)}%`;
+    // `distUnits` is the Three.js camera-to-target distance.
+    // 1 unit ~= 16.3 ly based on the HYG coordinate pipeline scaling.
+    setZoomLabel(distUnits) {
+      const distLY = Math.round(distUnits * 16.3);
+      zoomLabel.textContent =
+        distLY > 999 ? `${(distLY / 1000).toFixed(1)}k ly` : `${distLY} ly`;
     },
     setCoords({ wx, wy }) {
       const sx = pad3(Math.floor(Math.max(0, wx) / 100));
@@ -88,12 +92,8 @@ export function initUI({ map, factions, systems }) {
   };
 
   // Controls
-  document.getElementById('btn-zoom-in').addEventListener('click', () => {
-    map.zoomAt(window.innerWidth / 2, window.innerHeight / 2, 1.35);
-  });
-  document.getElementById('btn-zoom-out').addEventListener('click', () => {
-    map.zoomAt(window.innerWidth / 2, window.innerHeight / 2, 0.74);
-  });
+  document.getElementById('btn-zoom-in').addEventListener('click', () => map.zoomIn());
+  document.getElementById('btn-zoom-out').addEventListener('click', () => map.zoomOut());
   document.getElementById('reset-btn').addEventListener('click', () => map.resetView());
 
   closeBtn.addEventListener('click', () => map.setSelectedSystem(null));

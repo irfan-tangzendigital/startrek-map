@@ -20,7 +20,7 @@ let ui;
 (async () => {
   const map = await initMap(systems, factions, {
     onSelect: (sys) => ui?.openInfo(sys),
-    onZoomChange: (dist) => ui?.setZoomLabel(1 / Math.max(0.01, dist / 60)),
+    onZoomChange: (dist) => ui?.setZoomLabel(dist),
   });
 
   ui = initUI({ map, factions, systems });
