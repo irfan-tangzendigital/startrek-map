@@ -2,14 +2,32 @@ const THREE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.mi
 const ORBIT_URL = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js';
 
 const FACTION_ZONES_3D = {
-  federation:  { x: [-3,  +1], y: [-1, +1], z: [-3, +3] },
-  klingon:     { x: [+4, +10], y: [-1, +1], z: [-2, +4] },
-  romulan:     { x: [+4, +10], y: [-1, +2], z: [-6, -2] },
-  cardassian:  { x: [-8,  -3], y: [-1, +1], z: [+2, +6] },
-  ferengi:     { x: [-8,  -3], y: [-1, +1], z: [-4, -1] },
-  breen:       { x: [-6,  -2], y: [-2,  0], z: [+4, +8] },
-  dominion:    { x: [-4,   0], y: [-2,  0], z: [+3, +7] },
-  independent: { x: [-12, +12], y: [-2, +2], z: [-8, +8] },
+  federation:  { clusters: [
+    { x:  0.5, y: 0, z:  0.0, r: 2.6 },
+    { x:  2.0, y: 0, z:  1.2, r: 1.6 },
+  ]},
+  klingon:     { clusters: [
+    { x:  7.0, y: 0.4, z:  3.2, r: 2.8 },
+    { x:  5.5, y: 0.4, z:  4.5, r: 1.6 },
+  ]},
+  romulan:     { clusters: [
+    { x:  5.5, y: -0.3, z: -3.8, r: 2.4 },
+    { x:  7.0, y: -0.3, z: -2.5, r: 1.4 },
+  ]},
+  cardassian:  { clusters: [
+    { x: -7.5, y: 0.4, z:  5.5, r: 1.8 },  // pulled further to actual capital
+    { x: -6.2, y: 0.4, z:  4.2, r: 1.0 },  // smaller trailing lobe
+  ]},
+  ferengi:     { clusters: [
+    { x: -6.7, y: 0.3, z: -2.7, r: 1.8 },
+  ]},
+  breen:       { clusters: [
+    { x: -5.5, y: -0.6, z:  7.5, r: 1.4 }, // distinct, below plane
+  ]},
+  dominion:    { clusters: [
+    { x:  0.0, y: -1.5, z: 11.0, r: 2.0 }, // far Gamma Quadrant, well below plane
+  ]},
+  independent: null,
 };
 
 const CAPITAL_LABEL_DIST = 8;
@@ -549,51 +567,100 @@ function buildGrid(scene, THREE) {
   scene.add(grid);
 }
 
+// ─── BUILD FACTION CLOUDS (replace existing function) ────────────────────────
 function buildFactionClouds(scene, factions, THREE, starTex) {
   const cloudMeshes = new Map();
+
   for (const [key, faction] of Object.entries(factions)) {
     const zone = FACTION_ZONES_3D[key];
-    if (!zone) continue;
-    const N = 400;
-    const positions = new Float32Array(N * 3);
-    const rng = mulberry32(hashString(key + '_cloud'));
-    for (let i = 0; i < N; i++) {
-      positions[i * 3 + 0] = zone.x[0] + rng() * (zone.x[1] - zone.x[0]);
-      positions[i * 3 + 1] = zone.y[0] + rng() * (zone.y[1] - zone.y[0]);
-      positions[i * 3 + 2] = zone.z[0] + rng() * (zone.z[1] - zone.z[0]);
+    if (!zone || !zone.clusters) continue;
+
+    const color = faction.color;
+    const layers = [];
+
+    for (const cluster of zone.clusters) {
+      const { x: cx, y: cy, z: cz, r } = cluster;
+
+      // ── Layer 1: Dense core ──────────────────────────────────────────────
+      // Tight sphere of points, higher opacity = readable faction region
+      const CORE_N = 300;
+      const corePos = new Float32Array(CORE_N * 3);
+      const rng1 = mulberry32(hashString(key + cx + '_core'));
+      for (let i = 0; i < CORE_N; i++) {
+        // Uniform sphere distribution
+        const u = rng1(), v = rng1(), w = rng1();
+        const theta = 2 * Math.PI * u;
+        const phi = Math.acos(2 * v - 1);
+        const rad = r * 0.6 * Math.cbrt(w); // concentrate toward centre
+        corePos[i * 3 + 0] = cx + rad * Math.sin(phi) * Math.cos(theta);
+        corePos[i * 3 + 1] = cy + rad * 0.25 * Math.sin(phi) * Math.sin(theta); // flatten Y
+        corePos[i * 3 + 2] = cz + rad * Math.sin(phi) * Math.cos(theta + 1.2);
+      }
+      const coreGeo = new THREE.BufferGeometry();
+      coreGeo.setAttribute('position', new THREE.Float32BufferAttribute(corePos, 3));
+      const coreMat = new THREE.PointsMaterial({
+        color, size: 0.18, sizeAttenuation: true,
+        transparent: true, opacity: 0.22,
+        depthWrite: false, map: starTex, alphaTest: 0.01,
+      });
+      const core = new THREE.Points(coreGeo, coreMat);
+      scene.add(core);
+      layers.push(core);
+
+      // ── Layer 2: Soft nebula halo ────────────────────────────────────────
+      // Wider scatter, fades at edges
+      const HALO_N = 200;
+      const haloPos = new Float32Array(HALO_N * 3);
+      const rng2 = mulberry32(hashString(key + cx + '_halo'));
+      for (let i = 0; i < HALO_N; i++) {
+        const u = rng2(), v = rng2(), w = rng2();
+        const theta = 2 * Math.PI * u;
+        const phi = Math.acos(2 * v - 1);
+        const rad = r * (0.6 + 0.4 * w); // outer shell only
+        haloPos[i * 3 + 0] = cx + rad * Math.sin(phi) * Math.cos(theta);
+        haloPos[i * 3 + 1] = cy + rad * 0.2 * Math.sin(phi) * Math.sin(theta);
+        haloPos[i * 3 + 2] = cz + rad * Math.sin(phi) * Math.cos(theta + 1.2);
+      }
+      const haloGeo = new THREE.BufferGeometry();
+      haloGeo.setAttribute('position', new THREE.Float32BufferAttribute(haloPos, 3));
+      const haloMat = new THREE.PointsMaterial({
+        color, size: 0.5, sizeAttenuation: true,
+        transparent: true, opacity: 0.07,
+        depthWrite: false, map: starTex, alphaTest: 0.01,
+      });
+      const halo = new THREE.Points(haloGeo, haloMat);
+      scene.add(halo);
+      layers.push(halo);
+
+      // ── Layer 3: Border shimmer ring ────────────────────────────────────
+      // Points on the surface of the sphere only — creates a visible edge
+      const RING_N = 120;
+      const ringPos = new Float32Array(RING_N * 3);
+      const rng3 = mulberry32(hashString(key + cx + '_ring'));
+      for (let i = 0; i < RING_N; i++) {
+        const u = rng3(), v = rng3();
+        const theta = 2 * Math.PI * u;
+        const phi = Math.acos(2 * v - 1);
+        const rad = r * (0.92 + 0.08 * rng3()); // surface shell only
+        ringPos[i * 3 + 0] = cx + rad * Math.sin(phi) * Math.cos(theta);
+        ringPos[i * 3 + 1] = cy + rad * 0.15 * Math.sin(phi) * Math.sin(theta);
+        ringPos[i * 3 + 2] = cz + rad * Math.sin(phi) * Math.cos(theta + 1.2);
+      }
+      const ringGeo = new THREE.BufferGeometry();
+      ringGeo.setAttribute('position', new THREE.Float32BufferAttribute(ringPos, 3));
+      const ringMat = new THREE.PointsMaterial({
+        color, size: 0.28, sizeAttenuation: true,
+        transparent: true, opacity: 0.35, // noticeably brighter — this IS the border
+        depthWrite: false, map: starTex, alphaTest: 0.01,
+      });
+      const ring = new THREE.Points(ringGeo, ringMat);
+      scene.add(ring);
+      layers.push(ring);
     }
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
 
-    const innerMat = new THREE.PointsMaterial({
-      color: faction.color,
-      size: 0.20,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity: 0.10,
-      depthWrite: false,
-      map: starTex,
-      alphaTest: 0.01,
-    });
-    const inner = new THREE.Points(geo, innerMat);
-    scene.add(inner);
-
-    // Soft outer halo — fewer visual points but each is large and faint.
-    const outerMat = new THREE.PointsMaterial({
-      color: faction.color,
-      size: 0.6,
-      sizeAttenuation: true,
-      transparent: true,
-      opacity: 0.04,
-      depthWrite: false,
-      map: starTex,
-      alphaTest: 0.01,
-    });
-    const outer = new THREE.Points(geo, outerMat);
-    scene.add(outer);
-
-    cloudMeshes.set(key, [inner, outer]);
+    cloudMeshes.set(key, layers);
   }
+
   return cloudMeshes;
 }
 
