@@ -660,6 +660,10 @@ function buildFactionClouds(scene, factions, THREE, starTex) {
         depthWrite: false, map: starTex, alphaTest: 0.01,
       });
       const halo = new THREE.Points(haloGeo, haloMat);
+      halo.userData.animType = 'cloudHalo';
+      halo.userData.baseOpacity = 0.07;
+      halo.userData.amplitude = 0.02;
+      halo.userData.phase = (hashString(key) % 628) / 100;
       scene.add(halo);
       layers.push(halo);
 
@@ -685,6 +689,11 @@ function buildFactionClouds(scene, factions, THREE, starTex) {
         depthWrite: false, map: starTex, alphaTest: 0.01,
       });
       const ring = new THREE.Points(ringGeo, ringMat);
+      ring.userData.animType = 'cloudRing';
+      ring.userData.baseOpacity = 0.35;
+      ring.userData.amplitude = 0.08;
+      // +2.0 rad so the border shimmers out of sync with the core breath.
+      ring.userData.phase = (hashString(key) % 628) / 100 + 2.0;
       scene.add(ring);
       layers.push(ring);
     }
