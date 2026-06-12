@@ -194,6 +194,11 @@ export async function initMap(systems, factions, callbacks = {}) {
   buildSkybox(scene, THREE, starTex);
   buildGrid(scene, THREE);
   const factionCloudMeshes = buildFactionClouds(scene, factions, THREE, starTex);
+  for (const layers of factionCloudMeshes.values()) {
+    for (const layer of layers) {
+      if (layer.userData.animType) pulseObjects.push(layer);
+    }
+  }
 
   const capitalMeshes = [];
   const majorMeshes = [];
@@ -367,6 +372,15 @@ export async function initMap(systems, factions, callbacks = {}) {
     }
   }
 
+  // Breathing opacity for faction cloud layers (and any other registered
+  // pulse object). 0.35 rad/s ≈ an 18-second breath cycle.
+  function updateAmbient(t) {
+    for (const obj of pulseObjects) {
+      const u = obj.userData;
+      obj.material.opacity = u.baseOpacity + u.amplitude * Math.sin(t * 0.35 + u.phase);
+    }
+  }
+
   function updateLabelVisibility() {
     const camPos = camera.position;
     const tmp = new THREE.Vector3();
@@ -389,7 +403,7 @@ export async function initMap(systems, factions, callbacks = {}) {
     const delta = clock.getDelta();
     const t = clock.elapsedTime;
     void delta;
-    void t;
+    updateAmbient(t);
     const now = performance.now();
     updateFlyTo(now);
     controls.update();
@@ -617,6 +631,10 @@ function buildFactionClouds(scene, factions, THREE, starTex) {
         depthWrite: false, map: starTex, alphaTest: 0.01,
       });
       const core = new THREE.Points(coreGeo, coreMat);
+      core.userData.animType = 'cloudCore';
+      core.userData.baseOpacity = 0.22;
+      core.userData.amplitude = 0.05;
+      core.userData.phase = (hashString(key) % 628) / 100;
       scene.add(core);
       layers.push(core);
 

@@ -14,8 +14,8 @@
         {
           "id": "SA1.2",
           "title": "Cloud core pulse",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js buildFactionClouds(): core Points layers tagged userData {animType:'cloudCore', baseOpacity:0.22, amplitude:0.05, phase:(hashString(key)%628)/100}. initMap registers all tagged cloud layers into pulseObjects; new updateAmbient(t) in animate sets opacity = base + amp*sin(t*0.35 + phase). Faction cores now breathe on an ~18s cycle."
         },
         {
           "id": "SA1.3",
