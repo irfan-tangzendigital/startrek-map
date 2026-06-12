@@ -272,6 +272,10 @@ export async function initMap(systems, factions, callbacks = {}) {
     registerFactionObj(fkey, points);
   }
 
+  capitalOrbiters.push(
+    ...buildCapitalOrbiters(scene, systems, factions, THREE, registerFactionObj),
+  );
+
   const activeFactions = new Set(Object.keys(factions));
 
   const raycaster = new THREE.Raycaster();
@@ -378,6 +382,14 @@ export async function initMap(systems, factions, callbacks = {}) {
     for (const obj of pulseObjects) {
       const u = obj.userData;
       obj.material.opacity = u.baseOpacity + u.amplitude * Math.sin(t * 0.35 + u.phase);
+    }
+    for (const o of capitalOrbiters) {
+      const a = t * o.speed + o.phase;
+      o.mesh.position.set(
+        o.cx + o.radius * Math.cos(a),
+        o.cy + 0.05 * Math.sin(t * o.speed * 2 + o.phase),
+        o.cz + o.radius * Math.sin(a),
+      );
     }
   }
 
@@ -702,6 +714,38 @@ function buildFactionClouds(scene, factions, THREE, starTex) {
   }
 
   return cloudMeshes;
+}
+
+// One small glowing satellite per capital system, orbiting in the XZ plane
+// with a slight Y bob. Returns orbiter records consumed by the animate loop.
+function buildCapitalOrbiters(scene, systems, factions, THREE, registerFactionObj) {
+  const orbiters = [];
+  try {
+    for (const sys of systems) {
+      if (sys?.size !== 'capital' || !sys.pos3d) continue;
+      const fkey = sys.faction || '__unknown__';
+      const faction = factions[fkey] || factions.independent || { color: 0xaaaaaa };
+      const rng = mulberry32(hashString(sys.name || sys.id || 'capital'));
+      const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(0.045, 6, 6),
+        new THREE.MeshBasicMaterial({ color: faction.color }),
+      );
+      scene.add(mesh);
+      registerFactionObj?.(fkey, mesh);
+      orbiters.push({
+        mesh,
+        cx: sys.pos3d.x,
+        cy: sys.pos3d.y,
+        cz: sys.pos3d.z,
+        radius: 0.32,
+        speed: 0.25 + rng() * 0.2,
+        phase: rng() * Math.PI * 2,
+      });
+    }
+  } catch {
+    /* missing data fields — render map without orbiters */
+  }
+  return orbiters;
 }
 
 function buildCapitalGroup(sys, color, THREE) {

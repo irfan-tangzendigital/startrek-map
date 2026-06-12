@@ -26,8 +26,8 @@
         {
           "id": "SA1.4",
           "title": "Capital orbiter particles",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js: new buildCapitalOrbiters(scene, systems, factions, THREE, registerFactionObj) creates a SphereGeometry(0.045,6,6) faction-coloured satellite per capital with seeded radius 0.32 / speed 0.25-0.45 / random phase. Positions updated in updateAmbient(): XZ circular orbit + 0.05 Y bob at 2x speed. Orbiters registered per faction so the filter hides them with their faction."
         },
         {
           "id": "SA1.5",
