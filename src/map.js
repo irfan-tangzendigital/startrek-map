@@ -412,17 +412,16 @@ export async function initMap(systems, factions, callbacks = {}) {
   }
 
   function updateLabelVisibility() {
+    // System groups are direct scene children, so local position === world
+    // position — no per-frame getWorldPosition/Vector3 allocations needed.
     const camPos = camera.position;
-    const tmp = new THREE.Vector3();
     for (const g of capitalGroups) {
       if (!g.userData.label) continue;
-      const dist = camPos.distanceTo(g.getWorldPosition(tmp));
-      g.userData.label.visible = dist < CAPITAL_LABEL_DIST && g.visible;
+      g.userData.label.visible = camPos.distanceTo(g.position) < CAPITAL_LABEL_DIST && g.visible;
     }
     for (const g of majorData) {
       if (!g.userData.label) continue;
-      const dist = camPos.distanceTo(g.getWorldPosition(tmp));
-      g.userData.label.visible = dist < MAJOR_LABEL_DIST && g.visible;
+      g.userData.label.visible = camPos.distanceTo(g.position) < MAJOR_LABEL_DIST && g.visible;
     }
   }
 

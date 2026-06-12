@@ -38,8 +38,8 @@
   <h1>★ STELLAR CARTOGRAPHY — ENHANCEMENT PROGRESS</h1>
   <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#99CCFF">OVERALL COMPLETION</div>
   
-  <div class="bar"><div class="bar-fill" style="width:19%;background:#FF9900"></div>
-  <span class="bar-label">6 / 32</span></div>
+  <div class="bar"><div class="bar-fill" style="width:22%;background:#FF9900"></div>
+  <span class="bar-label">7 / 32</span></div>
   
   <section class="priority">
     <div class="p-header" style="border-color:#FF9900">
@@ -47,8 +47,8 @@
       <h2 style="color:#FF9900">PRIORITY 1 — ANIMATION LAYER</h2>
     </div>
     
-  <div class="bar"><div class="bar-fill" style="width:75%;background:#FF9900"></div>
-  <span class="bar-label">6 / 8</span></div>
+  <div class="bar"><div class="bar-fill" style="width:88%;background:#FF9900"></div>
+  <span class="bar-label">7 / 8</span></div>
     
   <div class="task">
     <div class="task-head">
@@ -102,9 +102,9 @@
     <div class="task-head">
       <span class="said">SA1.7</span>
       <span class="task-title">Performance audit</span>
-      <span class="badge todo">TODO</span>
+      <span class="badge done">DONE</span>
     </div>
-    
+    <details class="detail"><summary>CHANGE LOG</summary><div class="detail-body">Audit: animate loop contains zero scene.traverse calls; all animated objects iterate dedicated arrays (pulseObjects for cloud layers, twinkleObjects for minor Points, capitalOrbiters for satellites, capitalGroups for bloom pulse). Removed per-frame Vector3 allocation + getWorldPosition in updateLabelVisibility (groups are scene-root children so .position is world space). Vite production build passes. Caveat: 60fps confirmed by code audit + headless smoke test; Chrome DevTools profiling recommended on target hardware.<div class="shot-placeholder">NO VISUAL RECORD</div></div></details>
   </div>
   <div class="task">
     <div class="task-head">
@@ -337,6 +337,6 @@
     
   </div>
   </section>
-  <footer>LAST UPDATED: 2026-06-12T23:52:28.727Z</footer>
+  <footer>LAST UPDATED: 2026-06-12T23:54:09.804Z</footer>
 </body>
 </html>

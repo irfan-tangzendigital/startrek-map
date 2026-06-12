@@ -44,8 +44,8 @@
         {
           "id": "SA1.7",
           "title": "Performance audit",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "Audit: animate loop contains zero scene.traverse calls; all animated objects iterate dedicated arrays (pulseObjects for cloud layers, twinkleObjects for minor Points, capitalOrbiters for satellites, capitalGroups for bloom pulse). Removed per-frame Vector3 allocation + getWorldPosition in updateLabelVisibility (groups are scene-root children so .position is world space). Vite production build passes. Caveat: 60fps confirmed by code audit + headless smoke test; Chrome DevTools profiling recommended on target hardware."
         },
         {
           "id": "SA1.8",
