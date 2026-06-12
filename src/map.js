@@ -193,6 +193,7 @@ export async function initMap(systems, factions, callbacks = {}) {
   buildSkybox(scene, THREE, starTex);
   buildGrid(scene, THREE);
   buildQuadrantDivider(scene, THREE);
+  buildQuadrantWatermarks(scene, THREE);
   const factionCloudMeshes = buildFactionClouds(scene, factions, THREE, starTex);
   for (const layers of factionCloudMeshes.values()) {
     for (const layer of layers) {
@@ -631,6 +632,37 @@ function buildQuadrantDivider(scene, THREE) {
     opacity: 0.3,
   });
   scene.add(new THREE.Line(geo, mat));
+}
+
+// Large near-invisible quadrant name watermarks hovering over the plane.
+function buildQuadrantWatermarks(scene, THREE) {
+  const entries = [
+    { text: 'ALPHA QUADRANT', x: -4, y: 0.5, z: 0 },
+    { text: 'BETA QUADRANT', x: 6, y: 0.5, z: 0 },
+  ];
+  for (const { text, x, y, z } of entries) {
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1024;
+      canvas.height = 170;
+      const ctx = canvas.getContext('2d');
+      ctx.font = '110px "Share Tech Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = '#99AACC';
+      ctx.fillText(text, 512, 85);
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.needsUpdate = true;
+      const sprite = new THREE.Sprite(
+        new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.06, depthWrite: false }),
+      );
+      sprite.position.set(x, y, z);
+      sprite.scale.set(12, 2, 1);
+      scene.add(sprite);
+    } catch {
+      /* watermark skipped */
+    }
+  }
 }
 
 function buildGrid(scene, THREE) {

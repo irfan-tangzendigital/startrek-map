@@ -75,8 +75,8 @@
         {
           "id": "SA2.3",
           "title": "Quadrant watermark labels",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js: new buildQuadrantWatermarks(scene, THREE) renders 'ALPHA QUADRANT' at (-4,0.5,0) and 'BETA QUADRANT' at (6,0.5,0) as 1024x170 Share Tech Mono canvas sprites, colour #99AACC, material opacity 0.06, scale (12,2,1). Called from initMap after the divider line."
         },
         {
           "id": "SA2.4",
