@@ -198,6 +198,7 @@ export async function initMap(systems, factions, callbacks = {}) {
       if (layer.userData.animType) pulseObjects.push(layer);
     }
   }
+  const factionLabelSprites = buildFactionLabels(scene, factions, THREE);
 
   const capitalMeshes = [];
   const majorMeshes = [];
@@ -733,6 +734,52 @@ function buildFactionClouds(scene, factions, THREE, starTex) {
   }
 
   return cloudMeshes;
+}
+
+// Floating faction-abbreviation sprites above each territory's primary cluster.
+const FACTION_LABEL_POS = {
+  federation:  { x: 0.5,  y: 1.8, z: 0.0  },
+  klingon:     { x: 7.0,  y: 2.0, z: 3.2  },
+  romulan:     { x: 5.5,  y: 1.8, z: -3.8 },
+  cardassian:  { x: -7.2, y: 2.0, z: 5.2  },
+  ferengi:     { x: -6.7, y: 1.8, z: -2.7 },
+  breen:       { x: -5.5, y: 1.6, z: 7.5  },
+  dominion:    { x: -1.0, y: 1.6, z: 9.5  },
+};
+
+function buildFactionLabels(scene, factions, THREE) {
+  const sprites = new Map();
+  for (const [key, pos] of Object.entries(FACTION_LABEL_POS)) {
+    const faction = factions[key];
+    if (!faction) continue;
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      ctx.font = 'bold 52px Antonio, Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.globalAlpha = 0.55;
+      ctx.shadowColor = faction.css || '#FFFFFF';
+      ctx.shadowBlur = 18;
+      ctx.fillStyle = faction.css || '#FFFFFF';
+      ctx.fillText(faction.short || key.toUpperCase(), 256, 64);
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.needsUpdate = true;
+      const sprite = new THREE.Sprite(
+        new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }),
+      );
+      sprite.position.set(pos.x, pos.y, pos.z);
+      sprite.scale.set(4.0, 1.0, 1.0);
+      sprite.userData.baseScale = { x: 4.0, y: 1.0 };
+      scene.add(sprite);
+      sprites.set(key, sprite);
+    } catch {
+      /* label skipped — map still renders */
+    }
+  }
+  return sprites;
 }
 
 // One small glowing satellite per capital system, orbiting in the XZ plane

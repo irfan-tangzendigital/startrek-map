@@ -63,8 +63,8 @@
         {
           "id": "SA2.1",
           "title": "Faction label sprites",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js: new FACTION_LABEL_POS table + buildFactionLabels(scene, factions, THREE). Each of the 7 factions gets a 512x128 canvas with its short code (UFP/KE/RSE/CU/FA/BC/DOM) in bold 52px Antonio, faction.css colour, globalAlpha 0.55 and shadowBlur 18 glow, rendered as a CanvasTexture Sprite scaled 4.0x1.0 above its primary cluster. Returns Map(key->sprite), stored as factionLabelSprites in initMap."
         },
         {
           "id": "SA2.2",
