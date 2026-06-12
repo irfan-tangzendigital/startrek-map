@@ -38,8 +38,8 @@
         {
           "id": "SA1.6",
           "title": "Minor system twinkle",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js: minor-system Points clouds (per-faction batches in factionObjectsByKey) tagged userData {animType:'minorCloud', baseOpacity:0.55, twinklePhase: seeded random}. animate loop oscillates their material opacity +/-0.05 at t*1.8. Capital/major meshes are in separate arrays and unaffected."
         },
         {
           "id": "SA1.7",

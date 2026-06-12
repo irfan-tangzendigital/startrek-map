@@ -266,6 +266,10 @@ export async function initMap(systems, factions, callbacks = {}) {
       depthWrite: false,
     });
     const points = new THREE.Points(geo, mat);
+    points.userData.animType = 'minorCloud';
+    points.userData.baseOpacity = 0.55;
+    points.userData.twinklePhase = mulberry32(hashString(fkey))() * Math.PI * 2;
+    twinkleObjects.push(points);
     scene.add(points);
     minorMeshByFaction.set(fkey, points);
     registerFactionObj(fkey, points);
@@ -391,6 +395,11 @@ export async function initMap(systems, factions, callbacks = {}) {
     for (const obj of pulseObjects) {
       const u = obj.userData;
       obj.material.opacity = u.baseOpacity + u.amplitude * Math.sin(t * 0.35 + u.phase);
+    }
+    // Minor/STAPI Points only — capitals and majors are untouched.
+    for (const obj of twinkleObjects) {
+      const u = obj.userData;
+      obj.material.opacity = u.baseOpacity + 0.05 * Math.sin(t * 1.8 + u.twinklePhase);
     }
     for (const o of capitalOrbiters) {
       const a = t * o.speed + o.phase;
