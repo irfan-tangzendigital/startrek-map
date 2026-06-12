@@ -50,8 +50,8 @@
         {
           "id": "SA1.8",
           "title": "Integration & parameter tuning",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "Reviewed all motion together: cloud breath 0.35 rad/s (~18s), ring phase +2.0 rad, orbiters 0.25-0.45 rad/s, idle drift 0.06 rad/s, twinkle 1.8 rad/s. Also migrated the pre-existing capital bloom pulse from Date.now()*0.002 (2 rad/s strobe) to the shared clock at 0.9 rad/s so it sits between cloud breath and twinkle. Runtime verification: dev server + headless Chromium measured 165fps (uncapped monitor rate) with zero console errors."
         }
       ]
     },

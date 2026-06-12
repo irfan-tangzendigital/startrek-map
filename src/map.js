@@ -378,8 +378,10 @@ export async function initMap(systems, factions, callbacks = {}) {
     if (t >= 1) flyTo = null;
   }
 
-  function updatePulse(now) {
-    const pulse = 0.75 + Math.sin(now * 0.002) * 0.25;
+  function updatePulse(t) {
+    // 0.9 rad/s — quicker than the 0.35 rad/s cloud breath so capitals read
+    // as active beacons, but far calmer than the old 2 rad/s strobe.
+    const pulse = 0.75 + Math.sin(t * 0.9) * 0.25;
     for (const g of capitalGroups) {
       if (g.userData.bloomInner) g.userData.bloomInner.material.opacity = pulse * 0.6;
       if (g.userData.bloomOuter) g.userData.bloomOuter.material.opacity = pulse * 0.25;
@@ -436,7 +438,7 @@ export async function initMap(systems, factions, callbacks = {}) {
     const now = performance.now();
     updateFlyTo(now);
     controls.update();
-    updatePulse(Date.now());
+    updatePulse(t);
     updateLabelVisibility();
     renderer.render(scene, camera);
     callbacks.onZoomChange?.(camera.position.distanceTo(controls.target));
