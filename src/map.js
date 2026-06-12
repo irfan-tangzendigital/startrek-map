@@ -174,6 +174,13 @@ export async function initMap(systems, factions, callbacks = {}) {
   );
   camera.position.set(0, 18, 28);
 
+  const clock = new THREE.Clock();
+  // Animated object registries — animate() iterates these directly so we
+  // never have to scene.traverse() per frame.
+  const pulseObjects = [];
+  const capitalOrbiters = [];
+  const twinkleObjects = [];
+
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
@@ -377,6 +384,12 @@ export async function initMap(systems, factions, callbacks = {}) {
 
   function animate() {
     requestAnimationFrame(animate);
+    // getDelta() must be the single clock advance per frame; elapsedTime is
+    // refreshed by it, so read t from the property rather than getElapsedTime().
+    const delta = clock.getDelta();
+    const t = clock.elapsedTime;
+    void delta;
+    void t;
     const now = performance.now();
     updateFlyTo(now);
     controls.update();

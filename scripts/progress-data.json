@@ -5,14 +5,54 @@
       "title": "ANIMATION LAYER",
       "color": "#FF9900",
       "tasks": [
-        { "id": "SA1.1", "title": "Clock & timing infrastructure", "status": "TODO", "summary": "" },
-        { "id": "SA1.2", "title": "Cloud core pulse", "status": "TODO", "summary": "" },
-        { "id": "SA1.3", "title": "Cloud halo + ring pulse", "status": "TODO", "summary": "" },
-        { "id": "SA1.4", "title": "Capital orbiter particles", "status": "TODO", "summary": "" },
-        { "id": "SA1.5", "title": "Idle camera drift", "status": "TODO", "summary": "" },
-        { "id": "SA1.6", "title": "Minor system twinkle", "status": "TODO", "summary": "" },
-        { "id": "SA1.7", "title": "Performance audit", "status": "TODO", "summary": "" },
-        { "id": "SA1.8", "title": "Integration & parameter tuning", "status": "TODO", "summary": "" }
+        {
+          "id": "SA1.1",
+          "title": "Clock & timing infrastructure",
+          "status": "DONE",
+          "summary": "src/map.js: added THREE.Clock in initMap plus module-scope animation registries (pulseObjects, capitalOrbiters, twinkleObjects). animate() now captures delta via a single clock.getDelta() per frame and reads t from clock.elapsedTime (getElapsedTime() would double-advance the clock in r128). No scene.traverse used."
+        },
+        {
+          "id": "SA1.2",
+          "title": "Cloud core pulse",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA1.3",
+          "title": "Cloud halo + ring pulse",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA1.4",
+          "title": "Capital orbiter particles",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA1.5",
+          "title": "Idle camera drift",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA1.6",
+          "title": "Minor system twinkle",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA1.7",
+          "title": "Performance audit",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA1.8",
+          "title": "Integration & parameter tuning",
+          "status": "TODO",
+          "summary": ""
+        }
       ]
     },
     {
@@ -20,14 +60,54 @@
       "title": "POLITICAL CLARITY",
       "color": "#5599FF",
       "tasks": [
-        { "id": "SA2.1", "title": "Faction label sprites", "status": "TODO", "summary": "" },
-        { "id": "SA2.2", "title": "Alpha/Beta quadrant dividing line", "status": "TODO", "summary": "" },
-        { "id": "SA2.3", "title": "Quadrant watermark labels", "status": "TODO", "summary": "" },
-        { "id": "SA2.4", "title": "Neutral Zone border", "status": "TODO", "summary": "" },
-        { "id": "SA2.5", "title": "Labels tied to faction filter", "status": "TODO", "summary": "" },
-        { "id": "SA2.6", "title": "Label scale with zoom", "status": "TODO", "summary": "" },
-        { "id": "SA2.7", "title": "Font loading verification", "status": "TODO", "summary": "" },
-        { "id": "SA2.8", "title": "Final positioning calibration", "status": "TODO", "summary": "" }
+        {
+          "id": "SA2.1",
+          "title": "Faction label sprites",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA2.2",
+          "title": "Alpha/Beta quadrant dividing line",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA2.3",
+          "title": "Quadrant watermark labels",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA2.4",
+          "title": "Neutral Zone border",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA2.5",
+          "title": "Labels tied to faction filter",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA2.6",
+          "title": "Label scale with zoom",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA2.7",
+          "title": "Font loading verification",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA2.8",
+          "title": "Final positioning calibration",
+          "status": "TODO",
+          "summary": ""
+        }
       ]
     },
     {
@@ -35,14 +115,54 @@
       "title": "LCARS CHROME POLISH",
       "color": "#FFCC00",
       "tasks": [
-        { "id": "SA3.1", "title": "Stardate HUD", "status": "TODO", "summary": "" },
-        { "id": "SA3.2", "title": "Info panel scan-line animation", "status": "TODO", "summary": "" },
-        { "id": "SA3.3", "title": "Page boot sequence", "status": "TODO", "summary": "" },
-        { "id": "SA3.4", "title": "Faction colour pulse on system select", "status": "TODO", "summary": "" },
-        { "id": "SA3.5", "title": "Alert state toggle (Easter egg)", "status": "TODO", "summary": "" },
-        { "id": "SA3.6", "title": "Faction filter panel polish", "status": "TODO", "summary": "" },
-        { "id": "SA3.7", "title": "CSS variables consolidation", "status": "TODO", "summary": "" },
-        { "id": "SA3.8", "title": "Mobile responsive check", "status": "TODO", "summary": "" }
+        {
+          "id": "SA3.1",
+          "title": "Stardate HUD",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA3.2",
+          "title": "Info panel scan-line animation",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA3.3",
+          "title": "Page boot sequence",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA3.4",
+          "title": "Faction colour pulse on system select",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA3.5",
+          "title": "Alert state toggle (Easter egg)",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA3.6",
+          "title": "Faction filter panel polish",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA3.7",
+          "title": "CSS variables consolidation",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA3.8",
+          "title": "Mobile responsive check",
+          "status": "TODO",
+          "summary": ""
+        }
       ]
     },
     {
@@ -50,14 +170,54 @@
       "title": "SYSTEM DETAIL ON ZOOM",
       "color": "#44CCBB",
       "tasks": [
-        { "id": "SA4.1", "title": "Zoom threshold detection", "status": "TODO", "summary": "" },
-        { "id": "SA4.2", "title": "Procedural planet mesh generation", "status": "TODO", "summary": "" },
-        { "id": "SA4.3", "title": "Planet orbital mechanics", "status": "TODO", "summary": "" },
-        { "id": "SA4.4", "title": "Planet type differentiation", "status": "TODO", "summary": "" },
-        { "id": "SA4.5", "title": "Atmosphere glow", "status": "TODO", "summary": "" },
-        { "id": "SA4.6", "title": "Camera transition into system", "status": "TODO", "summary": "" },
-        { "id": "SA4.7", "title": "Back navigation", "status": "TODO", "summary": "" },
-        { "id": "SA4.8", "title": "System detail info panel update", "status": "TODO", "summary": "" }
+        {
+          "id": "SA4.1",
+          "title": "Zoom threshold detection",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA4.2",
+          "title": "Procedural planet mesh generation",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA4.3",
+          "title": "Planet orbital mechanics",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA4.4",
+          "title": "Planet type differentiation",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA4.5",
+          "title": "Atmosphere glow",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA4.6",
+          "title": "Camera transition into system",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA4.7",
+          "title": "Back navigation",
+          "status": "TODO",
+          "summary": ""
+        },
+        {
+          "id": "SA4.8",
+          "title": "System detail info panel update",
+          "status": "TODO",
+          "summary": ""
+        }
       ]
     }
   ]

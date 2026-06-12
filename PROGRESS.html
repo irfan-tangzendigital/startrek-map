@@ -38,8 +38,8 @@
   <h1>★ STELLAR CARTOGRAPHY — ENHANCEMENT PROGRESS</h1>
   <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#99CCFF">OVERALL COMPLETION</div>
   
-  <div class="bar"><div class="bar-fill" style="width:0%;background:#FF9900"></div>
-  <span class="bar-label">0 / 32</span></div>
+  <div class="bar"><div class="bar-fill" style="width:3%;background:#FF9900"></div>
+  <span class="bar-label">1 / 32</span></div>
   
   <section class="priority">
     <div class="p-header" style="border-color:#FF9900">
@@ -47,16 +47,16 @@
       <h2 style="color:#FF9900">PRIORITY 1 — ANIMATION LAYER</h2>
     </div>
     
-  <div class="bar"><div class="bar-fill" style="width:0%;background:#FF9900"></div>
-  <span class="bar-label">0 / 8</span></div>
+  <div class="bar"><div class="bar-fill" style="width:13%;background:#FF9900"></div>
+  <span class="bar-label">1 / 8</span></div>
     
   <div class="task">
     <div class="task-head">
       <span class="said">SA1.1</span>
       <span class="task-title">Clock &amp; timing infrastructure</span>
-      <span class="badge todo">TODO</span>
+      <span class="badge done">DONE</span>
     </div>
-    
+    <details class="detail"><summary>CHANGE LOG</summary><div class="detail-body">src/map.js: added THREE.Clock in initMap plus module-scope animation registries (pulseObjects, capitalOrbiters, twinkleObjects). animate() now captures delta via a single clock.getDelta() per frame and reads t from clock.elapsedTime (getElapsedTime() would double-advance the clock in r128). No scene.traverse used.<div class="shot-placeholder">NO VISUAL RECORD</div></div></details>
   </div>
   <div class="task">
     <div class="task-head">
@@ -337,6 +337,6 @@
     
   </div>
   </section>
-  <footer>LAST UPDATED: 2026-06-12T23:47:18.007Z</footer>
+  <footer>LAST UPDATED: 2026-06-12T23:47:59.974Z</footer>
 </body>
 </html>
