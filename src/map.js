@@ -858,15 +858,22 @@ function buildFactionLabels(scene, factions, THREE) {
       const canvas = document.createElement('canvas');
       canvas.width = 512;
       canvas.height = 128;
-      const ctx = canvas.getContext('2d');
-      ctx.font = 'bold 52px Antonio, Arial, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.globalAlpha = 0.55;
-      ctx.shadowColor = faction.css || '#FFFFFF';
-      ctx.shadowBlur = 18;
-      ctx.fillStyle = faction.css || '#FFFFFF';
-      ctx.fillText(faction.short || key.toUpperCase(), 256, 64);
+      const text = faction.short || key.toUpperCase();
+      const css = faction.css || '#FFFFFF';
+      const draw = () => {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, 512, 128);
+        // Falls back to Arial until the Antonio webfont is available.
+        ctx.font = 'bold 52px Antonio, Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.globalAlpha = 0.55;
+        ctx.shadowColor = css;
+        ctx.shadowBlur = 18;
+        ctx.fillStyle = css;
+        ctx.fillText(text, 256, 64);
+      };
+      draw();
       const tex = new THREE.CanvasTexture(canvas);
       tex.needsUpdate = true;
       const sprite = new THREE.Sprite(
@@ -875,11 +882,24 @@ function buildFactionLabels(scene, factions, THREE) {
       sprite.position.set(pos.x, pos.y, pos.z);
       sprite.scale.set(4.0, 1.0, 1.0);
       sprite.userData.baseScale = { x: 4.0, y: 1.0 };
+      sprite.userData.redraw = () => {
+        draw();
+        tex.needsUpdate = true;
+      };
       scene.add(sprite);
       sprites.set(key, sprite);
     } catch {
       /* label skipped — map still renders */
     }
+  }
+  // Repaint once the LCARS webfont is in — the first draw may have used the
+  // Arial fallback if Antonio hadn't finished loading.
+  try {
+    document.fonts?.ready?.then(() => {
+      for (const sprite of sprites.values()) sprite.userData.redraw?.();
+    });
+  } catch {
+    /* font API unavailable — fallback render stays */
   }
   return sprites;
 }

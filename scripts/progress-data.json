@@ -99,8 +99,8 @@
         {
           "id": "SA2.7",
           "title": "Font loading verification",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "index.html already loads Antonio + Share Tech Mono via Google Fonts (verified, no change needed). src/map.js buildFactionLabels(): label painting extracted into a redraw closure stored on sprite.userData; document.fonts.ready repaints every label texture once webfonts finish loading, so labels render in Antonio. Arial fallback stays if the font API or CDN is unavailable (try/catch, no console spam)."
         },
         {
           "id": "SA2.8",
