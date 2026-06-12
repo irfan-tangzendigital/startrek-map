@@ -32,8 +32,8 @@
         {
           "id": "SA1.5",
           "title": "Idle camera drift",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js: replaced OrbitControls autoRotate with tickIdleDrift(delta). pointerdown/wheel (and programmatic zoom/fly-to via bumpAutoRotate) reset lastInteraction; after 6000ms idle the camera rotates about the target Y axis at 0.06 rad/s (~105s per revolution), preserving current zoom radius and elevation. Drift is suppressed during fly-to tweens. Removed now-unused AUTOROTATE_RESUME_MS."
         },
         {
           "id": "SA1.6",

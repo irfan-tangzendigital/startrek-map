@@ -32,7 +32,6 @@ const FACTION_ZONES_3D = {
 
 const CAPITAL_LABEL_DIST = 8;
 const MAJOR_LABEL_DIST = 5;
-const AUTOROTATE_RESUME_MS = 4000;
 
 function injectScript(src) {
   return new Promise((resolve, reject) => {
@@ -184,8 +183,8 @@ export async function initMap(systems, factions, callbacks = {}) {
   const controls = new THREE.OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
-  controls.autoRotate = true;
-  controls.autoRotateSpeed = 0.15;
+  // Ambient motion is handled by tickIdleDrift below, not OrbitControls.
+  controls.autoRotate = false;
   controls.minDistance = 0.05;
   controls.maxDistance = 24.5; // 24.5 units × 16.3 ≈ 400 ly
   controls.target.set(0, 0, 0);
@@ -321,17 +320,27 @@ export async function initMap(systems, factions, callbacks = {}) {
     callbacks.onSelect?.(sys);
   });
 
-  // Pause autoRotate on interaction, resume after idle.
-  let autoRotateTimer = null;
+  // Idle camera drift: after 6s without interaction, slowly orbit the galaxy
+  // (0.06 rad/s ≈ one full revolution every ~105 seconds).
+  let lastInteraction = Date.now();
+  const IDLE_DRIFT_DELAY_MS = 6000;
+  const IDLE_DRIFT_SPEED = 0.06;
+  const driftAxis = new THREE.Vector3(0, 1, 0);
   function bumpAutoRotate() {
-    controls.autoRotate = false;
-    if (autoRotateTimer) clearTimeout(autoRotateTimer);
-    autoRotateTimer = setTimeout(() => {
-      controls.autoRotate = true;
-    }, AUTOROTATE_RESUME_MS);
+    lastInteraction = Date.now();
   }
   renderer.domElement.addEventListener('pointerdown', bumpAutoRotate);
   renderer.domElement.addEventListener('wheel', bumpAutoRotate, { passive: true });
+
+  function tickIdleDrift(delta) {
+    if (flyTo || Date.now() - lastInteraction < IDLE_DRIFT_DELAY_MS) return;
+    // Rotate the camera about the target's vertical axis — preserves the
+    // current zoom radius and elevation rather than snapping to a fixed orbit.
+    camera.position.sub(controls.target);
+    camera.position.applyAxisAngle(driftAxis, delta * IDLE_DRIFT_SPEED);
+    camera.position.add(controls.target);
+    camera.lookAt(controls.target);
+  }
 
   window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -414,7 +423,7 @@ export async function initMap(systems, factions, callbacks = {}) {
     // refreshed by it, so read t from the property rather than getElapsedTime().
     const delta = clock.getDelta();
     const t = clock.elapsedTime;
-    void delta;
+    tickIdleDrift(delta);
     updateAmbient(t);
     const now = performance.now();
     updateFlyTo(now);
