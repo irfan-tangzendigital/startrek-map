@@ -194,6 +194,7 @@ export async function initMap(systems, factions, callbacks = {}) {
   buildGrid(scene, THREE);
   buildQuadrantDivider(scene, THREE);
   buildQuadrantWatermarks(scene, THREE);
+  buildNeutralZone(scene, THREE, factions);
   const factionCloudMeshes = buildFactionClouds(scene, factions, THREE, starTex);
   for (const layers of factionCloudMeshes.values()) {
     for (const layer of layers) {
@@ -662,6 +663,44 @@ function buildQuadrantWatermarks(scene, THREE) {
     } catch {
       /* watermark skipped */
     }
+  }
+}
+
+// Romulan Neutral Zone — dotted boundary between Federation and Romulan
+// space, rendered as small spheres for visibility at map zoom.
+function buildNeutralZone(scene, THREE, factions) {
+  try {
+    const path = [
+      new THREE.Vector3(2, 0, -1),
+      new THREE.Vector3(4, 0, -2),
+      new THREE.Vector3(5.5, 0, -3),
+    ];
+    const fedColor = new THREE.Color(factions?.federation?.color ?? 0x3377ff);
+    const romColor = new THREE.Color(factions?.romulan?.color ?? 0x229933);
+    const totalLen =
+      path[0].distanceTo(path[1]) + path[1].distanceTo(path[2]);
+    const STEP = 0.35;
+    const geo = new THREE.SphereGeometry(0.05, 6, 6);
+    for (let d = 0; d <= totalLen; d += STEP) {
+      const segLen = path[0].distanceTo(path[1]);
+      const pos =
+        d <= segLen
+          ? new THREE.Vector3().lerpVectors(path[0], path[1], d / segLen)
+          : new THREE.Vector3().lerpVectors(
+              path[1],
+              path[2],
+              (d - segLen) / path[1].distanceTo(path[2]),
+            );
+      const color = fedColor.clone().lerp(romColor, d / totalLen);
+      const marker = new THREE.Mesh(
+        geo,
+        new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.4 }),
+      );
+      marker.position.copy(pos);
+      scene.add(marker);
+    }
+  } catch {
+    /* neutral zone skipped */
   }
 }
 

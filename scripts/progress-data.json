@@ -81,8 +81,8 @@
         {
           "id": "SA2.4",
           "title": "Neutral Zone border",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js: new buildNeutralZone(scene, THREE, factions) places SphereGeometry(0.05) markers every 0.35 units along the polyline (2,0,-1)->(4,0,-2)->(5.5,0,-3). Each marker colour is lerped from Federation blue to Romulan green by path fraction, MeshBasicMaterial opacity 0.4. Called from initMap."
         },
         {
           "id": "SA2.5",
