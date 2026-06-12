@@ -192,6 +192,7 @@ export async function initMap(systems, factions, callbacks = {}) {
   const starTex = makeStarTexture(THREE);
   buildSkybox(scene, THREE, starTex);
   buildGrid(scene, THREE);
+  buildQuadrantDivider(scene, THREE);
   const factionCloudMeshes = buildFactionClouds(scene, factions, THREE, starTex);
   for (const layers of factionCloudMeshes.values()) {
     for (const layer of layers) {
@@ -616,6 +617,20 @@ function buildSkybox(scene, THREE, starTex) {
   skybox.frustumCulled = false;
   skybox.renderOrder = -10;
   scene.add(skybox);
+}
+
+// Galactic meridian — the Alpha/Beta quadrant boundary at X = 0.
+function buildQuadrantDivider(scene, THREE) {
+  const geo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0, 0, -15),
+    new THREE.Vector3(0, 0, 15),
+  ]);
+  const mat = new THREE.LineBasicMaterial({
+    color: 0x334466,
+    transparent: true,
+    opacity: 0.3,
+  });
+  scene.add(new THREE.Line(geo, mat));
 }
 
 function buildGrid(scene, THREE) {

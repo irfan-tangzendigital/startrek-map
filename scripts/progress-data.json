@@ -69,8 +69,8 @@
         {
           "id": "SA2.2",
           "title": "Alpha/Beta quadrant dividing line",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js: new buildQuadrantDivider(scene, THREE) draws a THREE.Line from (0,0,-15) to (0,0,15) with LineBasicMaterial colour 0x334466 at opacity 0.3 — the galactic meridian separating Alpha and Beta quadrants. Called from initMap right after buildGrid."
         },
         {
           "id": "SA2.3",
