@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stellar Cartography — Enhancement Progress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Antonio:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #050510; color: #FFCCAA; font-family: 'Antonio', sans-serif; padding: 32px 24px 60px; max-width: 980px; margin: 0 auto; }
+  h1 { color: #FF9900; font-size: 28px; letter-spacing: .12em; border-bottom: 3px solid #FF9900; padding-bottom: 10px; margin-bottom: 18px; }
+  h2 { font-size: 20px; letter-spacing: .1em; }
+  .bar { position: relative; height: 22px; background: #11111f; border-radius: 11px; overflow: hidden; margin: 10px 0 16px; border: 1px solid #222238; }
+  .bar-fill { height: 100%; border-radius: 11px; transition: width .3s; }
+  .bar-label { position: absolute; right: 12px; top: 2px; font-family: 'Share Tech Mono', monospace; font-size: 13px; color: #fff; }
+  .priority { margin-top: 36px; }
+  .p-header { display: flex; align-items: center; gap: 12px; border-bottom: 2px solid; padding-bottom: 8px; }
+  .p-pill { width: 44px; height: 18px; border-radius: 9px 4px 4px 9px; }
+  .task { background: #0a0a18; border: 1px solid #1b1b30; border-radius: 4px 14px 14px 4px; margin-bottom: 8px; padding: 10px 14px; }
+  .task-head { display: flex; align-items: center; gap: 12px; }
+  .said { font-family: 'Share Tech Mono', monospace; color: #99CCFF; font-size: 13px; min-width: 52px; }
+  .task-title { flex: 1; font-size: 16px; letter-spacing: .04em; }
+  .badge { font-family: 'Share Tech Mono', monospace; font-size: 11px; padding: 3px 10px; border-radius: 100px; letter-spacing: .1em; }
+  .badge.todo { background: #222; color: #888; }
+  .badge.wip { background: #443300; color: #FFCC00; }
+  .badge.done { background: #003311; color: #33DD77; }
+  details.detail { margin-top: 8px; }
+  details.detail summary { cursor: pointer; font-family: 'Share Tech Mono', monospace; font-size: 11px; color: #FF9900; letter-spacing: .15em; }
+  .detail-body { font-family: 'Share Tech Mono', monospace; font-size: 12.5px; line-height: 1.6; color: #BBAA99; padding: 8px 4px 2px; white-space: pre-wrap; }
+  .detail-body img { display: block; max-width: 100%; margin-top: 8px; border: 1px solid #333; border-radius: 4px; }
+  .shot-placeholder { margin-top: 8px; border: 1px dashed #333; border-radius: 4px; padding: 8px; color: #444; font-size: 11px; letter-spacing: .12em; }
+  footer { margin-top: 40px; font-family: 'Share Tech Mono', monospace; font-size: 12px; color: #555577; letter-spacing: .08em; border-top: 1px solid #1b1b30; padding-top: 12px; }
+</style>
+</head>
+<body>
+  <h1>★ STELLAR CARTOGRAPHY — ENHANCEMENT PROGRESS</h1>
+  <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#99CCFF">OVERALL COMPLETION</div>
+  
+  <div class="bar"><div class="bar-fill" style="width:0%;background:#FF9900"></div>
+  <span class="bar-label">0 / 32</span></div>
+  
+  <section class="priority">
+    <div class="p-header" style="border-color:#FF9900">
+      <div class="p-pill" style="background:#FF9900"></div>
+      <h2 style="color:#FF9900">PRIORITY 1 — ANIMATION LAYER</h2>
+    </div>
+    
+  <div class="bar"><div class="bar-fill" style="width:0%;background:#FF9900"></div>
+  <span class="bar-label">0 / 8</span></div>
+    
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA1.1</span>
+      <span class="task-title">Clock &amp; timing infrastructure</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA1.2</span>
+      <span class="task-title">Cloud core pulse</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA1.3</span>
+      <span class="task-title">Cloud halo + ring pulse</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA1.4</span>
+      <span class="task-title">Capital orbiter particles</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA1.5</span>
+      <span class="task-title">Idle camera drift</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA1.6</span>
+      <span class="task-title">Minor system twinkle</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA1.7</span>
+      <span class="task-title">Performance audit</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA1.8</span>
+      <span class="task-title">Integration &amp; parameter tuning</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  </section>
+  <section class="priority">
+    <div class="p-header" style="border-color:#5599FF">
+      <div class="p-pill" style="background:#5599FF"></div>
+      <h2 style="color:#5599FF">PRIORITY 2 — POLITICAL CLARITY</h2>
+    </div>
+    
+  <div class="bar"><div class="bar-fill" style="width:0%;background:#5599FF"></div>
+  <span class="bar-label">0 / 8</span></div>
+    
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA2.1</span>
+      <span class="task-title">Faction label sprites</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA2.2</span>
+      <span class="task-title">Alpha/Beta quadrant dividing line</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA2.3</span>
+      <span class="task-title">Quadrant watermark labels</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA2.4</span>
+      <span class="task-title">Neutral Zone border</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA2.5</span>
+      <span class="task-title">Labels tied to faction filter</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA2.6</span>
+      <span class="task-title">Label scale with zoom</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA2.7</span>
+      <span class="task-title">Font loading verification</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA2.8</span>
+      <span class="task-title">Final positioning calibration</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  </section>
+  <section class="priority">
+    <div class="p-header" style="border-color:#FFCC00">
+      <div class="p-pill" style="background:#FFCC00"></div>
+      <h2 style="color:#FFCC00">PRIORITY 3 — LCARS CHROME POLISH</h2>
+    </div>
+    
+  <div class="bar"><div class="bar-fill" style="width:0%;background:#FFCC00"></div>
+  <span class="bar-label">0 / 8</span></div>
+    
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA3.1</span>
+      <span class="task-title">Stardate HUD</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA3.2</span>
+      <span class="task-title">Info panel scan-line animation</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA3.3</span>
+      <span class="task-title">Page boot sequence</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA3.4</span>
+      <span class="task-title">Faction colour pulse on system select</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA3.5</span>
+      <span class="task-title">Alert state toggle (Easter egg)</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA3.6</span>
+      <span class="task-title">Faction filter panel polish</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA3.7</span>
+      <span class="task-title">CSS variables consolidation</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA3.8</span>
+      <span class="task-title">Mobile responsive check</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  </section>
+  <section class="priority">
+    <div class="p-header" style="border-color:#44CCBB">
+      <div class="p-pill" style="background:#44CCBB"></div>
+      <h2 style="color:#44CCBB">PRIORITY 4 — SYSTEM DETAIL ON ZOOM</h2>
+    </div>
+    
+  <div class="bar"><div class="bar-fill" style="width:0%;background:#44CCBB"></div>
+  <span class="bar-label">0 / 8</span></div>
+    
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA4.1</span>
+      <span class="task-title">Zoom threshold detection</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA4.2</span>
+      <span class="task-title">Procedural planet mesh generation</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA4.3</span>
+      <span class="task-title">Planet orbital mechanics</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA4.4</span>
+      <span class="task-title">Planet type differentiation</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA4.5</span>
+      <span class="task-title">Atmosphere glow</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA4.6</span>
+      <span class="task-title">Camera transition into system</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA4.7</span>
+      <span class="task-title">Back navigation</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  <div class="task">
+    <div class="task-head">
+      <span class="said">SA4.8</span>
+      <span class="task-title">System detail info panel update</span>
+      <span class="badge todo">TODO</span>
+    </div>
+    
+  </div>
+  </section>
+  <footer>LAST UPDATED: 2026-06-12T23:47:18.007Z</footer>
+</body>
+</html>
