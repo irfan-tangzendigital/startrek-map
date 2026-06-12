@@ -38,8 +38,8 @@
   <h1>★ STELLAR CARTOGRAPHY — ENHANCEMENT PROGRESS</h1>
   <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#99CCFF">OVERALL COMPLETION</div>
   
-  <div class="bar"><div class="bar-fill" style="width:41%;background:#FF9900"></div>
-  <span class="bar-label">13 / 32</span></div>
+  <div class="bar"><div class="bar-fill" style="width:44%;background:#FF9900"></div>
+  <span class="bar-label">14 / 32</span></div>
   
   <section class="priority">
     <div class="p-header" style="border-color:#FF9900">
@@ -121,8 +121,8 @@
       <h2 style="color:#5599FF">PRIORITY 2 — POLITICAL CLARITY</h2>
     </div>
     
-  <div class="bar"><div class="bar-fill" style="width:63%;background:#5599FF"></div>
-  <span class="bar-label">5 / 8</span></div>
+  <div class="bar"><div class="bar-fill" style="width:75%;background:#5599FF"></div>
+  <span class="bar-label">6 / 8</span></div>
     
   <div class="task">
     <div class="task-head">
@@ -168,9 +168,9 @@
     <div class="task-head">
       <span class="said">SA2.6</span>
       <span class="task-title">Label scale with zoom</span>
-      <span class="badge todo">TODO</span>
+      <span class="badge done">DONE</span>
     </div>
-    
+    <details class="detail"><summary>CHANGE LOG</summary><div class="detail-body">src/map.js: new updateLabelScale() in animate reads camera distance from origin and maps it linearly to a 0.4x (dist&lt;=5) ... 1.5x (dist&gt;=15) factor applied to each label's stored baseScale (4.0,1.0), smoothed via sprite.scale.lerp(target, 0.05) with a single hoisted temp Vector3.<div class="shot-placeholder">NO VISUAL RECORD</div></div></details>
   </div>
   <div class="task">
     <div class="task-head">
@@ -337,6 +337,6 @@
     
   </div>
   </section>
-  <footer>LAST UPDATED: 2026-06-12T23:57:47.889Z</footer>
+  <footer>LAST UPDATED: 2026-06-12T23:58:05.790Z</footer>
 </body>
 </html>

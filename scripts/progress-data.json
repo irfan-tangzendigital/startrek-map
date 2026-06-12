@@ -93,8 +93,8 @@
         {
           "id": "SA2.6",
           "title": "Label scale with zoom",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js: new updateLabelScale() in animate reads camera distance from origin and maps it linearly to a 0.4x (dist<=5) ... 1.5x (dist>=15) factor applied to each label's stored baseScale (4.0,1.0), smoothed via sprite.scale.lerp(target, 0.05) with a single hoisted temp Vector3."
         },
         {
           "id": "SA2.7",

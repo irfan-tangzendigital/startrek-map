@@ -395,6 +395,19 @@ export async function initMap(systems, factions, callbacks = {}) {
     }
   }
 
+  // Keep faction labels readable at every zoom: scale factor runs linearly
+  // from 0.4x at camera distance 5 up to 1.5x at distance 15, smoothed.
+  const labelScaleTmp = new THREE.Vector3();
+  function updateLabelScale() {
+    const dist = camera.position.length();
+    const f = Math.min(1.5, Math.max(0.4, 0.4 + ((dist - 5) / 10) * 1.1));
+    for (const sprite of factionLabelSprites.values()) {
+      const base = sprite.userData.baseScale;
+      labelScaleTmp.set(base.x * f, base.y * f, 1);
+      sprite.scale.lerp(labelScaleTmp, 0.05);
+    }
+  }
+
   // Breathing opacity for faction cloud layers (and any other registered
   // pulse object). 0.35 rad/s ≈ an 18-second breath cycle.
   function updateAmbient(t) {
@@ -443,6 +456,7 @@ export async function initMap(systems, factions, callbacks = {}) {
     updateFlyTo(now);
     controls.update();
     updatePulse(t);
+    updateLabelScale();
     updateLabelVisibility();
     renderer.render(scene, camera);
     callbacks.onZoomChange?.(camera.position.distanceTo(controls.target));
