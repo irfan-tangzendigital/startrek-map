@@ -459,6 +459,8 @@ export async function initMap(systems, factions, callbacks = {}) {
     if (cloudLayers) {
       for (const layer of cloudLayers) layer.visible = visible;
     }
+    const labelSprite = factionLabelSprites.get(factionKey);
+    if (labelSprite) labelSprite.visible = visible;
   }
 
   function flyToSystem(sys) {

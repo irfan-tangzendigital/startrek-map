@@ -87,8 +87,8 @@
         {
           "id": "SA2.5",
           "title": "Labels tied to faction filter",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js setFactionVisible(): buildFactionLabels already returns Map(key->sprite) stored as factionLabelSprites; the toggle now also sets factionLabelSprites.get(key).visible alongside system meshes and cloud layers, so hiding a faction hides its floating label."
         },
         {
           "id": "SA2.6",
