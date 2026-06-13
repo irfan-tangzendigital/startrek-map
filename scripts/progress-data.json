@@ -154,8 +154,8 @@
         {
           "id": "SA3.7",
           "title": "CSS variables consolidation",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/style.css fully consolidated: all rgba accent/text/blue literals now use rgba(var(--accent)/--text-rgb/--blue-rgb, a); all var(--lcars-orange) usages routed through var(--accent-solid) so the SA3.5 alert toggle recolours every accent at once; one-off hexes replaced with new vars (--lcars-grey/skyblue/white/black); .ctrl-btn background now var(--lcars-panel). Remaining hex values exist only inside :root / alert-state variable definitions."
         },
         {
           "id": "SA3.8",
