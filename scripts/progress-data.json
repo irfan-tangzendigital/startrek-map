@@ -160,8 +160,8 @@
         {
           "id": "SA3.8",
           "title": "Mobile responsive check",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "index.html: added #faction-toggle hamburger. src/ui.js: toggle shows/hides #faction-panel via .mobile-open. src/style.css @media (max-width:600px): search bar full width, faction panel collapsed behind the hamburger, info panel becomes a full-width 62vh bottom sheet (slides up via bottom transition), coords readout hidden. Verified in 390x844 viewport: no horizontal scroll, toggle functions, panels readable (mobile-390.png)."
         }
       ]
     },

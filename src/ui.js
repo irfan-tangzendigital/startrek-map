@@ -134,6 +134,12 @@ export function initUI({ map, factions, systems }) {
     if (ALERT_STATES[alertIdx]) document.body.classList.add(ALERT_STATES[alertIdx]);
   });
 
+  // Mobile: faction panel collapses behind a hamburger toggle.
+  const factionToggle = document.getElementById('faction-toggle');
+  factionToggle?.addEventListener('click', () => {
+    document.getElementById('faction-panel')?.classList.toggle('mobile-open');
+  });
+
   // Faction filters
   buildFactionFilters({ map, factions, systems });
 

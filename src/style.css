@@ -433,6 +433,51 @@ body.booting #app, body.booting #ui { opacity: 0; }
   letter-spacing: .14em; pointer-events: none;
 }
 
+/* ── Mobile (≤600px) ──────────────────────────────────────── */
+#faction-toggle { display: none; }
+
+@media (max-width: 600px) {
+  /* Search: full width strip across the top */
+  #search-panel { left: 12px; right: 12px; width: auto; }
+
+  /* Faction filter: collapsed behind hamburger */
+  #faction-toggle {
+    display: block;
+    position: absolute;
+    top: 12px; right: 12px;
+    pointer-events: all;
+    background: var(--lcars-panel);
+    border: 1px solid rgba(var(--accent), .4);
+    border-radius: 2px 12px 12px 2px;
+    color: var(--accent-solid);
+    font-family: var(--font-lcars);
+    font-size: 13px;
+    letter-spacing: .12em;
+    padding: 8px 12px;
+    cursor: pointer;
+    z-index: 12;
+  }
+  #faction-panel { display: none; top: 54px; right: 12px; }
+  #faction-panel.mobile-open { display: block; }
+  #search-panel { top: 60px; left: 12px; right: 12px; }
+
+  /* Info panel: full-width bottom sheet instead of right sidebar */
+  #info-panel {
+    top: auto;
+    bottom: -100vh;
+    right: 0; left: 0;
+    width: 100%;
+    height: 62vh;
+    border-left: none;
+    border-top: 1px solid rgba(var(--accent), .35);
+    border-radius: 14px 14px 0 0;
+    transition: bottom .3s cubic-bezier(.4,0,.2,1);
+  }
+  #info-panel.open { bottom: 0; right: 0; }
+
+  #coords { display: none; }
+}
+
 /* ── LCARS corner accents ─────────────────────────────────── */
 .corner { position: absolute; pointer-events: none; width: 70px; height: 70px; }
 #c-tl { top: 0; left: 0; border-top: 2px solid rgba(var(--accent),.15); border-left: 2px solid rgba(var(--accent),.15); }
