@@ -345,6 +345,26 @@ body.booting #app, body.booting #ui { opacity: 0; }
   color: rgba(var(--text-rgb),.9);
 }
 
+/* Planet manifest (system detail view) */
+.planet-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 8px; border-radius: 4px;
+  font-family: var(--font-data); font-size: 13px;
+  color: rgba(var(--text-rgb), .85);
+}
+.planet-row + .planet-row { border-top: 1px solid rgba(var(--accent), .08); }
+.planet-dot { width: 8px; height: 8px; border-radius: 50%; background: #667788; flex-shrink: 0; }
+.planet-row.habitable .planet-dot { background: #44CC77; box-shadow: 0 0 6px #44CC77; }
+.planet-name { flex: 1; letter-spacing: .04em; }
+.planet-type {
+  font-size: 11px; letter-spacing: .1em; color: var(--accent-solid);
+}
+.planet-row.habitable .planet-type {
+  color: #44CC77; border: 1px solid rgba(68,204,119,.4);
+  border-radius: 100px; padding: 1px 8px;
+}
+.planet-period { font-size: 11px; color: rgba(var(--text-rgb), .45); min-width: 46px; text-align: right; }
+
 /* Timeline */
 .event-row {
   display: flex; gap: 12px; align-items: flex-start;

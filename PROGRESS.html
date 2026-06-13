@@ -38,8 +38,8 @@
   <h1>★ STELLAR CARTOGRAPHY — ENHANCEMENT PROGRESS</h1>
   <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#99CCFF">OVERALL COMPLETION</div>
   
-  <div class="bar"><div class="bar-fill" style="width:97%;background:#FF9900"></div>
-  <span class="bar-label">31 / 32</span></div>
+  <div class="bar"><div class="bar-fill" style="width:100%;background:#FF9900"></div>
+  <span class="bar-label">32 / 32</span></div>
   
   <section class="priority">
     <div class="p-header" style="border-color:#FF9900">
@@ -269,8 +269,8 @@
       <h2 style="color:#44CCBB">PRIORITY 4 — SYSTEM DETAIL ON ZOOM</h2>
     </div>
     
-  <div class="bar"><div class="bar-fill" style="width:88%;background:#44CCBB"></div>
-  <span class="bar-label">7 / 8</span></div>
+  <div class="bar"><div class="bar-fill" style="width:100%;background:#44CCBB"></div>
+  <span class="bar-label">8 / 8</span></div>
     
   <div class="task">
     <div class="task-head">
@@ -332,11 +332,11 @@
     <div class="task-head">
       <span class="said">SA4.8</span>
       <span class="task-title">System detail info panel update</span>
-      <span class="badge todo">TODO</span>
+      <span class="badge done">DONE</span>
     </div>
-    
+    <details class="detail"><summary>CHANGE LOG</summary><div class="detail-body">index.html: added #planets-section + #info-planets. src/ui.js: ui.openSystemView(sys, planets) sets the header to '[NAME] — SOLAR SYSTEM VIEW' and renders a planet manifest (auto roman-numeral names, type label, derived orbital period in days); Class M rows get a green glowing dot + pill 'CLASS M' badge. Passing null restores the normal selected-system panel. src/main.js wires onSystemView -&gt; ui.openSystemView. src/style.css: .planet-row styling. Verified: production build passes, page loads with zero console errors, all system-view DOM nodes present. Caveat: the &lt;1.5-unit zoom trigger can't be reached via the public search API (fly-to stops ~4.5 units), so the live fly-in + planet render was validated by code review + build rather than an automated deep-zoom; manual mouse-wheel zoom into a selected capital exercises it.<div class="shot-placeholder">NO VISUAL RECORD</div></div></details>
   </div>
   </section>
-  <footer>LAST UPDATED: 2026-06-13T00:11:17.699Z</footer>
+  <footer>LAST UPDATED: 2026-06-13T00:14:28.528Z</footer>
 </body>
 </html>

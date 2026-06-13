@@ -56,6 +56,7 @@ function runBootSequence(systemCount) {
   const map = await initMap(systems, factions, {
     onSelect: (sys) => ui?.openInfo(sys),
     onZoomChange: (dist) => ui?.setZoomLabel(dist),
+    onSystemView: (sys, planets) => ui?.openSystemView(sys, planets),
   });
 
   ui = initUI({ map, factions, systems });

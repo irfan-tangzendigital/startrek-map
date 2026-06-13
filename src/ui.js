@@ -87,6 +87,8 @@ export function initUI({ map, factions, systems }) {
         ? `https://memory-alpha.fandom.com/wiki/${sys.memAlpha}`
         : 'https://memory-alpha.fandom.com/wiki/Main_Page';
 
+      document.getElementById('planets-section').style.display = 'none';
+
       infoPanel.classList.add('open');
 
       // Restart the accent-bar pulse (class removal + reflow re-triggers it).
@@ -114,6 +116,45 @@ export function initUI({ map, factions, systems }) {
   }
   tickStardate();
   setInterval(tickStardate, 1000);
+
+  const PLANET_TYPE_LABELS = {
+    classM: 'CLASS M',
+    gasGiant: 'GAS GIANT',
+    barren: 'BARREN ROCK',
+    ice: 'ICE WORLD',
+    volcanic: 'VOLCANIC',
+  };
+
+  // System detail view: replace the panel body with the planet manifest.
+  ui.openSystemView = (sys, planets) => {
+    const section = document.getElementById('planets-section');
+    if (!sys) {
+      section.style.display = 'none';
+      const selected = map.selectedSystem;
+      if (selected) ui.openInfo(selected);
+      else infoPanel.classList.remove('open');
+      return;
+    }
+    ui.openInfo(sys);
+    document.getElementById('info-name').textContent = sys.name;
+    document.getElementById('info-subtitle').textContent =
+      `${(sys.name || '').toUpperCase()} — SOLAR SYSTEM VIEW`;
+    const list = document.getElementById('info-planets');
+    list.innerHTML = (planets || [])
+      .map((p) => {
+        const habitable = p.type === 'classM';
+        // Orbital period from angular speed, scaled to read as Earth-ish days.
+        const days = Math.round(((Math.PI * 2) / (p.orbitSpeed || 1)) * 42);
+        return `<div class="planet-row${habitable ? ' habitable' : ''}">
+          <span class="planet-dot"></span>
+          <span class="planet-name">${escapeHtml(p.name)}</span>
+          <span class="planet-type">${PLANET_TYPE_LABELS[p.type] || '—'}</span>
+          <span class="planet-period">${days} D</span>
+        </div>`;
+      })
+      .join('');
+    section.style.display = '';
+  };
 
   // Controls
   document.getElementById('btn-zoom-in').addEventListener('click', () => map.zoomIn());

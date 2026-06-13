@@ -215,8 +215,8 @@
         {
           "id": "SA4.8",
           "title": "System detail info panel update",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "index.html: added #planets-section + #info-planets. src/ui.js: ui.openSystemView(sys, planets) sets the header to '[NAME] — SOLAR SYSTEM VIEW' and renders a planet manifest (auto roman-numeral names, type label, derived orbital period in days); Class M rows get a green glowing dot + pill 'CLASS M' badge. Passing null restores the normal selected-system panel. src/main.js wires onSystemView -> ui.openSystemView. src/style.css: .planet-row styling. Verified: production build passes, page loads with zero console errors, all system-view DOM nodes present. Caveat: the <1.5-unit zoom trigger can't be reached via the public search API (fly-to stops ~4.5 units), so the live fly-in + planet render was validated by code review + build rather than an automated deep-zoom; manual mouse-wheel zoom into a selected capital exercises it."
         }
       ]
     }
