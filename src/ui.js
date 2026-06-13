@@ -3,6 +3,7 @@ import { openSectorView } from './sector-view.js';
 export function initUI({ map, factions, systems }) {
   const infoPanel = document.getElementById('info-panel');
   const closeBtn = document.getElementById('info-close');
+  const enterBtn = document.getElementById('enter-system');
   const zoomLabel = document.getElementById('zoom-label');
   const coordsLabel = document.getElementById('coords');
 
@@ -21,6 +22,7 @@ export function initUI({ map, factions, systems }) {
     },
     openInfo(sys) {
       if (!sys) {
+        if (enterBtn) enterBtn.style.display = 'none';
         infoPanel.classList.remove('open');
         return;
       }
@@ -89,6 +91,12 @@ export function initUI({ map, factions, systems }) {
 
       document.getElementById('planets-section').style.display = 'none';
 
+      // "Enter System" affordance only for systems that have a detail view.
+      if (enterBtn) {
+        const canEnter = sys.size === 'capital' || sys.size === 'major';
+        enterBtn.style.display = canEnter ? '' : 'none';
+      }
+
       infoPanel.classList.add('open');
 
       // Restart the accent-bar pulse (class removal + reflow re-triggers it).
@@ -136,6 +144,8 @@ export function initUI({ map, factions, systems }) {
       return;
     }
     ui.openInfo(sys);
+    // Already inside the system — hide the enter affordance.
+    if (enterBtn) enterBtn.style.display = 'none';
     document.getElementById('info-name').textContent = sys.name;
     document.getElementById('info-subtitle').textContent =
       `${(sys.name || '').toUpperCase()} — SOLAR SYSTEM VIEW`;
@@ -162,6 +172,7 @@ export function initUI({ map, factions, systems }) {
   document.getElementById('reset-btn').addEventListener('click', () => map.resetView());
 
   closeBtn.addEventListener('click', () => map.setSelectedSystem(null));
+  enterBtn?.addEventListener('click', () => map.enterSystem(map.selectedSystem));
 
   // Alert state Easter egg: 'A' cycles Normal -> Yellow Alert -> Red Alert.
   const ALERT_STATES = ['', 'alert-yellow', 'alert-red'];

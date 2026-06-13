@@ -3,29 +3,29 @@ const ORBIT_URL = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/contro
 
 const FACTION_ZONES_3D = {
   federation:  { clusters: [
-    { x:  0.5, y: 0, z:  0.0, r: 2.6 },
-    { x:  2.0, y: 0, z:  1.2, r: 1.6 },
+    { x:  0.5, y: 0, z:  0.0, r: 3.64 },
+    { x:  2.0, y: 0, z:  1.2, r: 2.24 },
   ]},
   klingon:     { clusters: [
-    { x:  7.0, y: 0.4, z:  3.2, r: 2.8 },
-    { x:  5.5, y: 0.4, z:  4.5, r: 1.6 },
+    { x:  7.0, y: 0.4, z:  3.2, r: 3.92 },
+    { x:  5.5, y: 0.4, z:  4.5, r: 2.24 },
   ]},
   romulan:     { clusters: [
-    { x:  5.5, y: -0.3, z: -3.8, r: 2.4 },
-    { x:  7.0, y: -0.3, z: -2.5, r: 1.4 },
+    { x:  5.5, y: -0.3, z: -3.8, r: 3.36 },
+    { x:  7.0, y: -0.3, z: -2.5, r: 1.96 },
   ]},
   cardassian:  { clusters: [
-    { x: -7.5, y: 0.4, z:  5.5, r: 1.8 },  // pulled further to actual capital
-    { x: -6.2, y: 0.4, z:  4.2, r: 1.0 },  // smaller trailing lobe
+    { x: -7.5, y: 0.4, z:  5.5, r: 2.52 },  // pulled further to actual capital
+    { x: -6.2, y: 0.4, z:  4.2, r: 1.4 },  // smaller trailing lobe
   ]},
   ferengi:     { clusters: [
-    { x: -6.7, y: 0.3, z: -2.7, r: 1.8 },
+    { x: -6.7, y: 0.3, z: -2.7, r: 2.52 },
   ]},
   breen:       { clusters: [
-    { x: -5.5, y: -0.6, z:  7.5, r: 1.4 }, // distinct, below plane
+    { x: -5.5, y: -0.6, z:  7.5, r: 1.96 }, // distinct, below plane
   ]},
   dominion:    { clusters: [
-    { x:  0.0, y: -1.5, z: 11.0, r: 2.0 }, // far Gamma Quadrant, well below plane
+    { x:  0.0, y: -1.5, z: 11.0, r: 2.8 }, // far Gamma Quadrant, well below plane
   ]},
   independent: null,
 };
@@ -328,6 +328,22 @@ export async function initMap(systems, factions, callbacks = {}) {
     callbacks.onSelect?.(sys);
   });
 
+  // Double-click a capital/major system to fly in and enter its system view.
+  renderer.domElement.addEventListener('dblclick', (e) => {
+    if (systemView.active || systemView.transition) return;
+    const rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    const hits = raycaster.intersectObjects([...capitalMeshes, ...majorMeshes], false);
+    if (!hits.length) return;
+    const sys = hits[0].object.userData.system;
+    if (!sys) return;
+    selectedSystem = sys;
+    callbacks.onSelect?.(sys);
+    enterSystemView(sys);
+  });
+
   // Idle camera drift: after 6s without interaction, slowly orbit the galaxy
   // (0.06 rad/s ≈ one full revolution every ~105 seconds).
   let lastInteraction = Date.now();
@@ -395,21 +411,16 @@ export async function initMap(systems, factions, callbacks = {}) {
     hidden: [],
   };
   const sysViewTmp = new THREE.Vector3();
-  const ENTER_SYSTEM_DIST = 1.5;
-  const EXIT_SYSTEM_DIST = 2.5;
+  // Entry into system view is now explicit (Enter System button / double-click).
+  // We only auto-exit when the camera is pulled far enough back out.
+  const EXIT_SYSTEM_DIST = 9.0;
 
   function tickSystemView() {
-    if (systemView.transition) return;
-    if (!systemView.active) {
-      const sys = selectedSystem;
-      if (!sys?.pos3d || (sys.size !== 'capital' && sys.size !== 'major')) return;
-      sysViewTmp.set(sys.pos3d.x, sys.pos3d.y, sys.pos3d.z);
-      if (camera.position.distanceTo(sysViewTmp) < ENTER_SYSTEM_DIST) enterSystemView(sys);
-    } else {
-      const sys = systemView.system;
-      sysViewTmp.set(sys.pos3d.x, sys.pos3d.y, sys.pos3d.z);
-      if (camera.position.distanceTo(sysViewTmp) > EXIT_SYSTEM_DIST) exitSystemView();
-    }
+    if (systemView.transition || !systemView.active) return;
+    const sys = systemView.system;
+    if (!sys?.pos3d) return;
+    sysViewTmp.set(sys.pos3d.x, sys.pos3d.y, sys.pos3d.z);
+    if (camera.position.distanceTo(sysViewTmp) > EXIT_SYSTEM_DIST) exitSystemView();
   }
 
   function hideGalaxyObjects() {
@@ -452,7 +463,7 @@ export async function initMap(systems, factions, callbacks = {}) {
       const p = system.pos3d;
       systemView.transition = {
         fromCam: camera.position.clone(),
-        toCam: new THREE.Vector3(p.x, p.y + 1.0, p.z + 2.0),
+        toCam: new THREE.Vector3(p.x, p.y + 2.4, p.z + 4.4),
         fromTarget: controls.target.clone(),
         toTarget: new THREE.Vector3(p.x, p.y, p.z),
         t0: performance.now(),
@@ -514,13 +525,14 @@ export async function initMap(systems, factions, callbacks = {}) {
   // Kepler-style orbital motion for the active system view.
   function updateSystemOrbits(t) {
     if (!systemView.active) return;
-    for (const { config: p, mesh } of systemView.planets) {
+    for (const { config: p, mesh, clouds } of systemView.planets) {
       const a = t * p.orbitSpeed + p.orbitPhase;
       mesh.position.set(
         p.orbitRadius * Math.cos(a),
         p.inclination * Math.sin(a),
         p.orbitRadius * Math.sin(a),
       );
+      if (clouds) clouds.rotation.y += clouds.userData.cloudSpin;
     }
   }
 
@@ -709,6 +721,12 @@ export async function initMap(systems, factions, callbacks = {}) {
     setFactionEnabled: setFactionVisible,
     flyToSystem,
     flyTo: flyToSystem,
+    enterSystem: (sys) => {
+      const target = sys || selectedSystem;
+      if (target?.pos3d && (target.size === 'capital' || target.size === 'major')) {
+        enterSystemView(target);
+      }
+    },
     resetView,
     zoomIn,
     zoomOut,
@@ -869,7 +887,7 @@ function buildGrid(scene, THREE) {
   const grid = new THREE.GridHelper(60, 30, 0x1a3a5c, 0x0d1f30);
   grid.position.y = -0.1;
   grid.material.transparent = true;
-  grid.material.opacity = 0.55;
+  grid.material.opacity = 0.06;
   scene.add(grid);
 }
 
@@ -889,7 +907,7 @@ function buildFactionClouds(scene, factions, THREE, starTex) {
 
       // ── Layer 1: Dense core ──────────────────────────────────────────────
       // Tight sphere of points, higher opacity = readable faction region
-      const CORE_N = 300;
+      const CORE_N = 1200;
       const corePos = new Float32Array(CORE_N * 3);
       const rng1 = mulberry32(hashString(key + cx + '_core'));
       for (let i = 0; i < CORE_N; i++) {
@@ -905,13 +923,13 @@ function buildFactionClouds(scene, factions, THREE, starTex) {
       const coreGeo = new THREE.BufferGeometry();
       coreGeo.setAttribute('position', new THREE.Float32BufferAttribute(corePos, 3));
       const coreMat = new THREE.PointsMaterial({
-        color, size: 0.18, sizeAttenuation: true,
-        transparent: true, opacity: 0.22,
+        color, size: 0.22, sizeAttenuation: true,
+        transparent: true, opacity: 0.32,
         depthWrite: false, map: starTex, alphaTest: 0.01,
       });
       const core = new THREE.Points(coreGeo, coreMat);
       core.userData.animType = 'cloudCore';
-      core.userData.baseOpacity = 0.22;
+      core.userData.baseOpacity = 0.32;
       core.userData.amplitude = 0.05;
       core.userData.phase = (hashString(key) % 628) / 100;
       scene.add(core);
@@ -919,7 +937,7 @@ function buildFactionClouds(scene, factions, THREE, starTex) {
 
       // ── Layer 2: Soft nebula halo ────────────────────────────────────────
       // Wider scatter, fades at edges
-      const HALO_N = 200;
+      const HALO_N = 600;
       const haloPos = new Float32Array(HALO_N * 3);
       const rng2 = mulberry32(hashString(key + cx + '_halo'));
       for (let i = 0; i < HALO_N; i++) {
@@ -948,7 +966,7 @@ function buildFactionClouds(scene, factions, THREE, starTex) {
 
       // ── Layer 3: Border shimmer ring ────────────────────────────────────
       // Points on the surface of the sphere only — creates a visible edge
-      const RING_N = 120;
+      const RING_N = 300;
       const ringPos = new Float32Array(RING_N * 3);
       const rng3 = mulberry32(hashString(key + cx + '_ring'));
       for (let i = 0; i < RING_N; i++) {
@@ -964,12 +982,12 @@ function buildFactionClouds(scene, factions, THREE, starTex) {
       ringGeo.setAttribute('position', new THREE.Float32BufferAttribute(ringPos, 3));
       const ringMat = new THREE.PointsMaterial({
         color, size: 0.28, sizeAttenuation: true,
-        transparent: true, opacity: 0.35, // noticeably brighter — this IS the border
+        transparent: true, opacity: 0.45, // noticeably brighter — this IS the border
         depthWrite: false, map: starTex, alphaTest: 0.01,
       });
       const ring = new THREE.Points(ringGeo, ringMat);
       ring.userData.animType = 'cloudRing';
-      ring.userData.baseOpacity = 0.35;
+      ring.userData.baseOpacity = 0.45;
       ring.userData.amplitude = 0.08;
       // +2.0 rad so the border shimmers out of sync with the core breath.
       ring.userData.phase = (hashString(key) % 628) / 100 + 2.0;
@@ -1091,14 +1109,68 @@ function romanNumeral(n) {
   return s;
 }
 
+// System-view orbital scale (Three.js units). Inner orbit and outermost orbit
+// the layout is normalised between. The galaxy is hidden while a system view is
+// active, so this scale is independent of galaxy spacing.
+const SYSTEM_INNER_R = 0.5;
+const SYSTEM_OUTER_R = 3.2;
+
+// Real Sol system, ordered by distance. `au` = semi-major axis in astronomical
+// units; mapped through a sqrt compression so the inner planets stay accurately
+// clustered while Neptune still fits on screen. Radii are relative, clamped to
+// stay visible at this scale.
+const SOL_PLANETS = [
+  { name: 'Mercury', type: 'barren',   au: 0.39,  radius: 0.035 },
+  { name: 'Venus',   type: 'barren',   au: 0.72,  radius: 0.05 },
+  { name: 'Earth',   type: 'classM',   au: 1.00,  radius: 0.052 },
+  { name: 'Mars',    type: 'volcanic', au: 1.52,  radius: 0.042 },
+  { name: 'Jupiter', type: 'gasGiant', au: 5.20,  radius: 0.13 },
+  { name: 'Saturn',  type: 'gasGiant', au: 9.58,  radius: 0.11, hasRing: true },
+  { name: 'Uranus',  type: 'ice',      au: 19.2,  radius: 0.075 },
+  { name: 'Neptune', type: 'ice',      au: 30.05, radius: 0.072 },
+];
+
+// sqrt-compressed map from AU to view radius, normalised across Sol's range so
+// Mercury lands at SYSTEM_INNER_R and Neptune at SYSTEM_OUTER_R.
+function auToOrbit(au) {
+  const sMin = Math.sqrt(SOL_PLANETS[0].au);
+  const sMax = Math.sqrt(SOL_PLANETS[SOL_PLANETS.length - 1].au);
+  const f = (Math.sqrt(au) - sMin) / (sMax - sMin);
+  return SYSTEM_INNER_R + f * (SYSTEM_OUTER_R - SYSTEM_INNER_R);
+}
+
 // Deterministic planet configs for a system — same system always yields the
-// same solar system. Count, sizes, types and orbits all derive from the name.
+// same solar system. Sol uses the real planet set at accurate (compressed)
+// distances; every other system is procedural with growing-gap orbital spacing.
 function generatePlanets(system, factions, THREE) {
   void THREE;
   try {
+    const faction = factions?.[system?.faction];
+    const factionColor = faction?.color ?? 0xaaaaaa;
+    const id = String(system?.id || '').toLowerCase();
+    const isSol = id === 'sol' || /^sol(\s|$)/i.test(system?.name || '');
+
+    if (isSol) {
+      return SOL_PLANETS.map((sp, i) => {
+        const orbitRadius = auToOrbit(sp.au);
+        const rng = mulberry32(hashString('sol_' + sp.name));
+        return {
+          index: i,
+          name: sp.name,
+          type: sp.type,
+          radius: sp.radius,
+          hasRing: !!sp.hasRing,
+          orbitRadius,
+          orbitSpeed: 0.4 / Math.sqrt(orbitRadius),
+          orbitPhase: rng() * Math.PI * 2,
+          inclination: (rng() * 3 * Math.PI) / 180,
+          factionColor,
+        };
+      });
+    }
+
     const rng = mulberry32(hashString(system?.name || system?.id || 'system'));
     const count = 3 + Math.floor(rng() * 6); // 3–8
-    const faction = factions?.[system?.faction];
     const baseName = String(system?.name || 'System').replace(/\s+system$/i, '');
     const planets = [];
     for (let i = 0; i < count; i++) {
@@ -1109,7 +1181,13 @@ function generatePlanets(system, factions, THREE) {
         : typeRoll < 0.65 ? 'barren'
         : typeRoll < 0.85 ? 'ice'
         : 'volcanic';
-      const orbitRadius = 0.3 + i * 0.25;
+      // Growing-gap spacing: orbits bunch up near the star and spread out
+      // toward the rim (power curve), normalised so the outermost planet always
+      // lands near SYSTEM_OUTER_R regardless of count.
+      const t = count > 1 ? i / (count - 1) : 0;
+      const jitter = 1 + (rng() - 0.5) * 0.06;
+      const orbitRadius =
+        (SYSTEM_INNER_R + (SYSTEM_OUTER_R - SYSTEM_INNER_R) * Math.pow(t, 1.4)) * jitter;
       planets.push({
         index: i,
         name: `${baseName} ${romanNumeral(i + 1)}`,
@@ -1120,7 +1198,7 @@ function generatePlanets(system, factions, THREE) {
         orbitSpeed: 0.4 / Math.sqrt(orbitRadius), // Kepler-ish: inner = faster
         orbitPhase: rng() * Math.PI * 2,
         inclination: ((rng() * 8) * Math.PI) / 180,
-        factionColor: faction?.color ?? 0xaaaaaa,
+        factionColor,
       });
     }
     return planets;
@@ -1137,16 +1215,90 @@ const PLANET_STYLES = {
   volcanic: { color: 0x663322, roughness: 0.9,  metalness: 0.15, emissive: 0x551100 },
 };
 
-// MeshStandardMaterial per type, tinted 15% toward the owning faction.
+// Canvas-generated procedural texture per planet type. Still fully procedural
+// (no external assets) but reads like an actual planet surface rather than a
+// solid-colour ball. `type` matches the values emitted by generatePlanets:
+// classM | gasGiant | barren | ice | volcanic.
+function generatePlanetTexture(type, seed, factionColor, THREE) {
+  void factionColor;
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  const rng = mulberry32(seed);
+
+  if (type === 'classM') {
+    // Deep ocean base
+    ctx.fillStyle = '#1a3a5c';
+    ctx.fillRect(0, 0, 256, 128);
+    // Landmass patches
+    for (let i = 0; i < 12; i++) {
+      const x = rng() * 256, y = rng() * 128, w = 20 + rng() * 60, h = 15 + rng() * 40;
+      ctx.fillStyle = `hsl(${100 + rng() * 40},${40 + rng() * 20}%,${25 + rng() * 15}%)`;
+      ctx.beginPath();
+      ctx.ellipse(x, y, w, h, rng() * Math.PI, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    // Ice caps
+    ctx.fillStyle = 'rgba(220,235,255,0.7)';
+    ctx.fillRect(0, 0, 256, 12);
+    ctx.fillRect(0, 116, 256, 12);
+  } else if (type === 'gasGiant') {
+    // Horizontal bands
+    const baseHue = 25 + rng() * 20;
+    for (let y = 0; y < 128; y++) {
+      const noise = Math.sin(y * 0.3 + rng() * 2) * 8;
+      ctx.fillStyle = `hsl(${baseHue + noise},${50 + rng() * 20}%,${40 + rng() * 20}%)`;
+      ctx.fillRect(0, y, 256, 1);
+    }
+    // Great spot
+    ctx.fillStyle = `hsla(${baseHue - 10},60%,30%,0.6)`;
+    ctx.beginPath();
+    ctx.ellipse(80 + rng() * 100, 60 + rng() * 20, 20, 12, 0, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (type === 'volcanic') {
+    ctx.fillStyle = '#1a0800';
+    ctx.fillRect(0, 0, 256, 128);
+    for (let i = 0; i < 20; i++) {
+      ctx.fillStyle = `hsla(${15 + rng() * 20},90%,${30 + rng() * 30}%,${0.3 + rng() * 0.4})`;
+      ctx.beginPath();
+      ctx.arc(rng() * 256, rng() * 128, 5 + rng() * 25, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (type === 'ice') {
+    ctx.fillStyle = '#c8dde8';
+    ctx.fillRect(0, 0, 256, 128);
+    for (let i = 0; i < 30; i++) {
+      ctx.strokeStyle = `rgba(150,180,200,${0.3 + rng() * 0.4})`;
+      ctx.lineWidth = 1 + rng() * 2;
+      ctx.beginPath();
+      ctx.moveTo(rng() * 256, rng() * 128);
+      ctx.lineTo(rng() * 256, rng() * 128);
+      ctx.stroke();
+    }
+  } else { // barren
+    ctx.fillStyle = '#5a4a3a';
+    ctx.fillRect(0, 0, 256, 128);
+    for (let i = 0; i < 25; i++) {
+      ctx.fillStyle = `rgba(30,20,15,${0.4 + rng() * 0.4})`;
+      ctx.beginPath();
+      ctx.arc(rng() * 256, rng() * 128, 3 + rng() * 12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  return tex;
+}
+
+// MeshStandardMaterial mapped with a procedural canvas texture per type.
 // Lit by the AmbientLight + star PointLight added in buildSystemViewGroup.
 function makePlanetMaterial(p, THREE) {
-  const s = PLANET_STYLES[p.type] || PLANET_STYLES.barren;
-  const color = new THREE.Color(s.color).lerp(new THREE.Color(p.factionColor), 0.15);
   return new THREE.MeshStandardMaterial({
-    color,
-    roughness: s.roughness,
-    metalness: s.metalness,
-    emissive: s.emissive ? new THREE.Color(s.emissive) : new THREE.Color(0x000000),
+    map: generatePlanetTexture(p.type, hashString(p.name), p.factionColor, THREE),
+    roughness: 0.8,
+    metalness: 0.0,
   });
 }
 
@@ -1168,28 +1320,35 @@ function buildSystemViewGroup(system, planets, THREE) {
   const group = new THREE.Group();
   group.position.set(system.pos3d.x, system.pos3d.y, system.pos3d.z);
 
+  // Sol gets a larger, warmer Sun than a generic procedural star.
+  const isSol = String(system?.id || '').toLowerCase() === 'sol';
+  const starRadius = isSol ? 0.18 : 0.12;
+  const starColor = isSol ? 0xfff2cc : 0xffeecc;
+
   const star = new THREE.Mesh(
-    new THREE.SphereGeometry(0.12, 16, 16),
-    new THREE.MeshBasicMaterial({ color: 0xffeecc }),
+    new THREE.SphereGeometry(starRadius, 16, 16),
+    new THREE.MeshBasicMaterial({ color: starColor }),
   );
   group.add(star);
 
   // Lighting for the MeshStandardMaterial planets: the star is the key light.
+  // Range covers the full orbital span (SYSTEM_OUTER_R) with headroom.
   group.add(new THREE.AmbientLight(0x334455, 0.7));
-  const starLight = new THREE.PointLight(0xffeedd, 1.4, 10);
+  const starLight = new THREE.PointLight(0xffeedd, 1.4, 12);
   group.add(starLight);
 
-  // Additive bloom around the star.
+  // Additive bloom around the star, scaled to the star size.
   const starBloom = new THREE.Sprite(
     new THREE.SpriteMaterial({
-      map: makeBloomTexture(0xffddaa),
+      map: makeBloomTexture(isSol ? 0xffeebb : 0xffddaa),
       blending: THREE.AdditiveBlending,
       transparent: true,
       depthWrite: false,
       opacity: 0.85,
     }),
   );
-  starBloom.scale.set(0.9, 0.9, 1);
+  const bloomScale = starRadius * 7.5;
+  starBloom.scale.set(bloomScale, bloomScale, 1);
   group.add(starBloom);
 
   const planetMeshes = [];
@@ -1200,7 +1359,7 @@ function buildSystemViewGroup(system, planets, THREE) {
     const mesh = new THREE.Mesh(geo, makePlanetMaterial(p, THREE));
     mesh.position.set(p.orbitRadius, 0, 0);
     group.add(mesh);
-    planetMeshes.push({ config: p, mesh });
+    let clouds;
 
     if (p.type === 'classM') {
       // Atmosphere halo: slightly larger back-face shell, faction-tinted blue.
@@ -1216,7 +1375,34 @@ function buildSystemViewGroup(system, planets, THREE) {
         }),
       );
       mesh.add(atmosphere);
+
+      // Rotating cloud layer — procedurally drawn wisps on a thin shell.
+      const cloudGeo = new THREE.SphereGeometry(p.radius * 1.05, 16, 16);
+      const cloudCanvas = document.createElement('canvas');
+      cloudCanvas.width = 256;
+      cloudCanvas.height = 128;
+      const cctx = cloudCanvas.getContext('2d');
+      const crng = mulberry32(hashString(p.name + 'clouds'));
+      for (let i = 0; i < 15; i++) {
+        cctx.fillStyle = `rgba(255,255,255,${0.3 + crng() * 0.4})`;
+        cctx.beginPath();
+        cctx.ellipse(crng() * 256, crng() * 128, 20 + crng() * 50, 8 + crng() * 20, crng() * Math.PI, 0, Math.PI * 2);
+        cctx.fill();
+      }
+      const cloudTex = new THREE.CanvasTexture(cloudCanvas);
+      cloudTex.needsUpdate = true;
+      const cloudMat = new THREE.MeshStandardMaterial({
+        map: cloudTex,
+        transparent: true,
+        opacity: 0.6,
+        depthWrite: false,
+      });
+      clouds = new THREE.Mesh(cloudGeo, cloudMat);
+      clouds.userData.cloudSpin = 0.0008 + crng() * 0.0004;
+      mesh.add(clouds);
     }
+
+    planetMeshes.push({ config: p, mesh, clouds });
 
     if (p.hasRing) {
       const planetRing = new THREE.Mesh(
@@ -1246,6 +1432,50 @@ function buildSystemViewGroup(system, planets, THREE) {
     orbit.rotation.x = -Math.PI / 2;
     group.add(orbit);
   }
+
+  // Asteroid belt: settle it in the largest gap among the rocky inner planets
+  // (i.e. just inside the first gas giant), mirroring how the real Sol belt sits
+  // between Mars and Jupiter. Skipped if there isn't a usable gap.
+  const firstGiant = planetMeshes.findIndex((e) => e.config.type === 'gasGiant');
+  const gapLimit = firstGiant === -1 ? planetMeshes.length - 1 : firstGiant;
+  let beltGapIdx = -1;
+  let beltGapSize = -1;
+  for (let i = 0; i < gapLimit; i++) {
+    const gap = planetMeshes[i + 1].config.orbitRadius - planetMeshes[i].config.orbitRadius;
+    if (gap > beltGapSize) {
+      beltGapSize = gap;
+      beltGapIdx = i;
+    }
+  }
+  if (beltGapIdx >= 0) {
+    const beltRadius =
+      (planetMeshes[beltGapIdx].config.orbitRadius +
+        planetMeshes[beltGapIdx + 1].config.orbitRadius) / 2;
+    const beltSpread = Math.max(0.05, beltGapSize * 0.3);
+    const BELT_N = 800;
+    const beltPositions = new Float32Array(BELT_N * 3);
+    const beltRng = mulberry32(hashString(system.name + '_belt'));
+    for (let i = 0; i < BELT_N; i++) {
+      const angle = beltRng() * Math.PI * 2;
+      const r = beltRadius + (beltRng() - 0.5) * beltSpread;
+      const yScatter = (beltRng() - 0.5) * 0.06;
+      beltPositions[i * 3 + 0] = r * Math.cos(angle);
+      beltPositions[i * 3 + 1] = yScatter;
+      beltPositions[i * 3 + 2] = r * Math.sin(angle);
+    }
+    const beltGeo = new THREE.BufferGeometry();
+    beltGeo.setAttribute('position', new THREE.Float32BufferAttribute(beltPositions, 3));
+    const beltMat = new THREE.PointsMaterial({
+      color: 0x886644,
+      size: 0.02,
+      sizeAttenuation: true,
+      transparent: true,
+      opacity: 0.6,
+      depthWrite: false,
+    });
+    group.add(new THREE.Points(beltGeo, beltMat));
+  }
+
   return { group, planetMeshes };
 }
 

@@ -283,6 +283,27 @@ body.booting #app, body.booting #ui { opacity: 0; }
 }
 #info-close:hover { background: rgba(var(--accent),.25); }
 
+/* "Enter System" call-to-action — drops the camera into the solar-system view */
+#enter-system {
+  display: none;
+  margin-top: 14px;
+  width: 100%;
+  background: rgba(var(--accent),.12);
+  border: 1px solid rgba(var(--accent),.5);
+  border-left: 4px solid var(--accent-solid);
+  border-radius: 2px 12px 12px 2px;
+  color: var(--accent-solid);
+  font-family: var(--font-lcars);
+  font-size: 13px; font-weight: 700;
+  letter-spacing: .16em;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background .15s;
+}
+#enter-system:hover { background: rgba(var(--accent),.28); }
+/* Never show the galaxy-level enter button while already inside a system */
+body.system-view #enter-system { display: none !important; }
+
 #info-faction-tag {
   font-family: var(--font-lcars);
   font-size: 12px; font-weight: 700;
