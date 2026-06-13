@@ -1055,9 +1055,38 @@ function generatePlanets(system, factions, THREE) {
   }
 }
 
-// Placeholder material — replaced with typed materials in SA4.4.
+const PLANET_STYLES = {
+  classM:   { color: 0x4488aa, roughness: 0.75, metalness: 0.05 },
+  gasGiant: { color: 0xccaa66, roughness: 0.55, metalness: 0.0 },
+  barren:   { color: 0x887766, roughness: 1.0,  metalness: 0.05 },
+  ice:      { color: 0xaaccdd, roughness: 0.25, metalness: 0.1 },
+  volcanic: { color: 0x663322, roughness: 0.9,  metalness: 0.15, emissive: 0x551100 },
+};
+
+// MeshStandardMaterial per type, tinted 15% toward the owning faction.
+// Lit by the AmbientLight + star PointLight added in buildSystemViewGroup.
 function makePlanetMaterial(p, THREE) {
-  return new THREE.MeshBasicMaterial({ color: p.factionColor });
+  const s = PLANET_STYLES[p.type] || PLANET_STYLES.barren;
+  const color = new THREE.Color(s.color).lerp(new THREE.Color(p.factionColor), 0.15);
+  return new THREE.MeshStandardMaterial({
+    color,
+    roughness: s.roughness,
+    metalness: s.metalness,
+    emissive: s.emissive ? new THREE.Color(s.emissive) : new THREE.Color(0x000000),
+  });
+}
+
+// Rough surfaces (continents / craters) via seeded vertex displacement —
+// the bump-map trick without any texture assets.
+function roughenGeometry(geo, seed, amount) {
+  const pos = geo.getAttribute('position');
+  const rng = mulberry32(seed);
+  for (let i = 0; i < pos.count; i++) {
+    const f = 1 + (rng() - 0.5) * amount;
+    pos.setXYZ(i, pos.getX(i) * f, pos.getY(i) * f, pos.getZ(i) * f);
+  }
+  pos.needsUpdate = true;
+  geo.computeVertexNormals();
 }
 
 // Builds the local solar system group centred on the system's position.
@@ -1073,13 +1102,28 @@ function buildSystemViewGroup(system, planets, THREE) {
 
   const planetMeshes = [];
   for (const p of planets) {
-    const mesh = new THREE.Mesh(
-      new THREE.SphereGeometry(p.radius, 16, 16),
-      makePlanetMaterial(p, THREE),
-    );
+    const geo = new THREE.SphereGeometry(p.radius, 16, 16);
+    if (p.type === 'barren') roughenGeometry(geo, hashString(p.name), 0.12);
+    else if (p.type === 'classM') roughenGeometry(geo, hashString(p.name), 0.04);
+    const mesh = new THREE.Mesh(geo, makePlanetMaterial(p, THREE));
     mesh.position.set(p.orbitRadius, 0, 0);
     group.add(mesh);
     planetMeshes.push({ config: p, mesh });
+
+    if (p.hasRing) {
+      const planetRing = new THREE.Mesh(
+        new THREE.RingGeometry(p.radius * 1.4, p.radius * 2.1, 32),
+        new THREE.MeshBasicMaterial({
+          color: 0xbbaa88,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.45,
+          depthWrite: false,
+        }),
+      );
+      planetRing.rotation.x = -Math.PI / 2.4;
+      mesh.add(planetRing); // child — follows the orbit
+    }
 
     const orbit = new THREE.Mesh(
       new THREE.RingGeometry(p.orbitRadius - 0.0025, p.orbitRadius + 0.0025, 64),

@@ -191,8 +191,8 @@
         {
           "id": "SA4.4",
           "title": "Planet type differentiation",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js: PLANET_STYLES table — Class M blue-green 0x4488AA, gas giant 0xCCAA66 (larger radius, 0xBBAA88 ring child when seeded hasRing), barren grey 0x887766 with crater vertex displacement (roughenGeometry, 12%), ice 0xAACCDD, volcanic 0x663322 with emissive glow 0x551100. makePlanetMaterial returns MeshStandardMaterial with per-type roughness/metalness, colour lerped 15% toward faction colour. Class M gets subtle 4% vertex noise for continents."
         },
         {
           "id": "SA4.5",
