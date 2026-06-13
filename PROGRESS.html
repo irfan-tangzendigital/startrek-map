@@ -38,8 +38,8 @@
   <h1>★ STELLAR CARTOGRAPHY — ENHANCEMENT PROGRESS</h1>
   <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#99CCFF">OVERALL COMPLETION</div>
   
-  <div class="bar"><div class="bar-fill" style="width:78%;background:#FF9900"></div>
-  <span class="bar-label">25 / 32</span></div>
+  <div class="bar"><div class="bar-fill" style="width:81%;background:#FF9900"></div>
+  <span class="bar-label">26 / 32</span></div>
   
   <section class="priority">
     <div class="p-header" style="border-color:#FF9900">
@@ -269,8 +269,8 @@
       <h2 style="color:#44CCBB">PRIORITY 4 — SYSTEM DETAIL ON ZOOM</h2>
     </div>
     
-  <div class="bar"><div class="bar-fill" style="width:13%;background:#44CCBB"></div>
-  <span class="bar-label">1 / 8</span></div>
+  <div class="bar"><div class="bar-fill" style="width:25%;background:#44CCBB"></div>
+  <span class="bar-label">2 / 8</span></div>
     
   <div class="task">
     <div class="task-head">
@@ -284,9 +284,9 @@
     <div class="task-head">
       <span class="said">SA4.2</span>
       <span class="task-title">Procedural planet mesh generation</span>
-      <span class="badge todo">TODO</span>
+      <span class="badge done">DONE</span>
     </div>
-    
+    <details class="detail"><summary>CHANGE LOG</summary><div class="detail-body">src/map.js: new generatePlanets(system, factions, THREE) returns 3-8 deterministic planet configs seeded from hashString(system.name) via mulberry32 — type (classM/gasGiant/barren/ice/volcanic), radius 0.04-0.14 (gas giants larger), optional ring (seed&gt;0.7), orbitRadius/orbitSpeed/orbitPhase/inclination, faction colour, and auto-generated roman-numeral name. try/catch returns [] on malformed data. Helper romanNumeral() added.<div class="shot-placeholder">NO VISUAL RECORD</div></div></details>
   </div>
   <div class="task">
     <div class="task-head">
@@ -337,6 +337,6 @@
     
   </div>
   </section>
-  <footer>LAST UPDATED: 2026-06-13T00:06:53.811Z</footer>
+  <footer>LAST UPDATED: 2026-06-13T00:07:25.602Z</footer>
 </body>
 </html>

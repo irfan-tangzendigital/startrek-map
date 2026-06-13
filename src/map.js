@@ -980,6 +980,52 @@ function buildCapitalOrbiters(scene, systems, factions, THREE, registerFactionOb
   return orbiters;
 }
 
+// ─── Procedural solar systems (system detail view) ──────────────────────────
+function romanNumeral(n) {
+  const table = [['X', 10], ['IX', 9], ['V', 5], ['IV', 4], ['I', 1]];
+  let s = '';
+  for (const [r, v] of table) while (n >= v) { s += r; n -= v; }
+  return s;
+}
+
+// Deterministic planet configs for a system — same system always yields the
+// same solar system. Count, sizes, types and orbits all derive from the name.
+function generatePlanets(system, factions, THREE) {
+  void THREE;
+  try {
+    const rng = mulberry32(hashString(system?.name || system?.id || 'system'));
+    const count = 3 + Math.floor(rng() * 6); // 3–8
+    const faction = factions?.[system?.faction];
+    const baseName = String(system?.name || 'System').replace(/\s+system$/i, '');
+    const planets = [];
+    for (let i = 0; i < count; i++) {
+      const typeRoll = rng();
+      const type =
+        typeRoll < 0.25 ? 'classM'
+        : typeRoll < 0.45 ? 'gasGiant'
+        : typeRoll < 0.65 ? 'barren'
+        : typeRoll < 0.85 ? 'ice'
+        : 'volcanic';
+      const orbitRadius = 0.3 + i * 0.25;
+      planets.push({
+        index: i,
+        name: `${baseName} ${romanNumeral(i + 1)}`,
+        type,
+        radius: type === 'gasGiant' ? 0.09 + rng() * 0.05 : 0.04 + rng() * 0.06,
+        hasRing: type === 'gasGiant' && rng() > 0.7,
+        orbitRadius,
+        orbitSpeed: 0.4 / Math.sqrt(orbitRadius), // Kepler-ish: inner = faster
+        orbitPhase: rng() * Math.PI * 2,
+        inclination: ((rng() * 8) * Math.PI) / 180,
+        factionColor: faction?.color ?? 0xaaaaaa,
+      });
+    }
+    return planets;
+  } catch {
+    return [];
+  }
+}
+
 function buildCapitalGroup(sys, color, THREE) {
   const group = new THREE.Group();
   group.position.set(sys.pos3d.x, sys.pos3d.y, sys.pos3d.z);

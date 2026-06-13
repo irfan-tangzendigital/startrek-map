@@ -179,8 +179,8 @@
         {
           "id": "SA4.2",
           "title": "Procedural planet mesh generation",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js: new generatePlanets(system, factions, THREE) returns 3-8 deterministic planet configs seeded from hashString(system.name) via mulberry32 — type (classM/gasGiant/barren/ice/volcanic), radius 0.04-0.14 (gas giants larger), optional ring (seed>0.7), orbitRadius/orbitSpeed/orbitPhase/inclination, faction colour, and auto-generated roman-numeral name. try/catch returns [] on malformed data. Helper romanNumeral() added."
         },
         {
           "id": "SA4.3",
