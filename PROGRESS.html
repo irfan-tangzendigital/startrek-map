@@ -38,8 +38,8 @@
   <h1>★ STELLAR CARTOGRAPHY — ENHANCEMENT PROGRESS</h1>
   <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#99CCFF">OVERALL COMPLETION</div>
   
-  <div class="bar"><div class="bar-fill" style="width:75%;background:#FF9900"></div>
-  <span class="bar-label">24 / 32</span></div>
+  <div class="bar"><div class="bar-fill" style="width:78%;background:#FF9900"></div>
+  <span class="bar-label">25 / 32</span></div>
   
   <section class="priority">
     <div class="p-header" style="border-color:#FF9900">
@@ -269,16 +269,16 @@
       <h2 style="color:#44CCBB">PRIORITY 4 — SYSTEM DETAIL ON ZOOM</h2>
     </div>
     
-  <div class="bar"><div class="bar-fill" style="width:0%;background:#44CCBB"></div>
-  <span class="bar-label">0 / 8</span></div>
+  <div class="bar"><div class="bar-fill" style="width:13%;background:#44CCBB"></div>
+  <span class="bar-label">1 / 8</span></div>
     
   <div class="task">
     <div class="task-head">
       <span class="said">SA4.1</span>
       <span class="task-title">Zoom threshold detection</span>
-      <span class="badge todo">TODO</span>
+      <span class="badge done">DONE</span>
     </div>
-    
+    <details class="detail"><summary>CHANGE LOG</summary><div class="detail-body">src/map.js: systemView state object + tickSystemView() in the animate loop. When a capital/major system is selected and camera distance to it drops below 1.5 world units, enterSystemView(system) fires; once active, pulling back past 2.5 units fires exitSystemView(). Transition guard prevents re-triggering mid-tween; single hoisted temp Vector3, no per-frame allocation.<div class="shot-placeholder">NO VISUAL RECORD</div></div></details>
   </div>
   <div class="task">
     <div class="task-head">
@@ -337,6 +337,6 @@
     
   </div>
   </section>
-  <footer>LAST UPDATED: 2026-06-13T00:06:09.639Z</footer>
+  <footer>LAST UPDATED: 2026-06-13T00:06:53.811Z</footer>
 </body>
 </html>

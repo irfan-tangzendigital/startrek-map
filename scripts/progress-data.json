@@ -173,8 +173,8 @@
         {
           "id": "SA4.1",
           "title": "Zoom threshold detection",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js: systemView state object + tickSystemView() in the animate loop. When a capital/major system is selected and camera distance to it drops below 1.5 world units, enterSystemView(system) fires; once active, pulling back past 2.5 units fires exitSystemView(). Transition guard prevents re-triggering mid-tween; single hoisted temp Vector3, no per-frame allocation."
         },
         {
           "id": "SA4.2",

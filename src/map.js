@@ -382,6 +382,47 @@ export async function initMap(systems, factions, callbacks = {}) {
     if (t >= 1) flyTo = null;
   }
 
+  // ── System detail view (procedural solar system on deep zoom) ──────────
+  const systemView = {
+    active: false,
+    system: null,
+    group: null,
+    planets: [],
+    savedCam: null,
+    savedTarget: null,
+    transition: null,
+    hidden: [],
+  };
+  const sysViewTmp = new THREE.Vector3();
+  const ENTER_SYSTEM_DIST = 1.5;
+  const EXIT_SYSTEM_DIST = 2.5;
+
+  function tickSystemView() {
+    if (systemView.transition) return;
+    if (!systemView.active) {
+      const sys = selectedSystem;
+      if (!sys?.pos3d || (sys.size !== 'capital' && sys.size !== 'major')) return;
+      sysViewTmp.set(sys.pos3d.x, sys.pos3d.y, sys.pos3d.z);
+      if (camera.position.distanceTo(sysViewTmp) < ENTER_SYSTEM_DIST) enterSystemView(sys);
+    } else {
+      const sys = systemView.system;
+      sysViewTmp.set(sys.pos3d.x, sys.pos3d.y, sys.pos3d.z);
+      if (camera.position.distanceTo(sysViewTmp) > EXIT_SYSTEM_DIST) exitSystemView();
+    }
+  }
+
+  function enterSystemView(system) {
+    if (systemView.active || !system?.pos3d) return;
+    systemView.active = true;
+    systemView.system = system;
+  }
+
+  function exitSystemView() {
+    if (!systemView.active) return;
+    systemView.active = false;
+    systemView.system = null;
+  }
+
   function updatePulse(t) {
     // 0.9 rad/s — quicker than the 0.35 rad/s cloud breath so capitals read
     // as active beacons, but far calmer than the old 2 rad/s strobe.
@@ -456,6 +497,7 @@ export async function initMap(systems, factions, callbacks = {}) {
     updateFlyTo(now);
     controls.update();
     updatePulse(t);
+    tickSystemView();
     updateLabelScale();
     updateLabelVisibility();
     renderer.render(scene, camera);
