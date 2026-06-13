@@ -163,12 +163,26 @@ body.booting #app, body.booting #ui { opacity: 0; }
   cursor: pointer; text-align: left;
   transition: background .12s, opacity .2s;
 }
-.faction-btn:hover { background: rgba(255,153,0,.09); }
+.faction-btn {
+  border-radius: 2px 12px 12px 2px;
+  border-left: 3px solid transparent;
+  margin: 1px 6px 1px 0;
+  width: calc(100% - 6px);
+}
+.faction-btn:hover { background: color-mix(in srgb, var(--f, var(--accent-solid)) 20%, transparent); }
+.faction-btn.active { border-left-color: var(--f, var(--accent-solid)); }
 .faction-btn.off { opacity: 0.28; }
 .faction-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.faction-count {
+  margin-left: auto;
+  font-family: var(--font-data);
+  font-size: 11px;
+  letter-spacing: .05em;
+  color: var(--f, var(--accent-solid));
+}
+.faction-btn.off .faction-count { color: #666; }
 
 .faction-3d-btn {
-  margin-left: auto;
   background: transparent;
   border: 1px solid rgba(255,153,0,.3);
   border-radius: 4px;

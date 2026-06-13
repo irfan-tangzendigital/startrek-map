@@ -148,8 +148,8 @@
         {
           "id": "SA3.6",
           "title": "Faction filter panel polish",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/ui.js buildFactionFilters(): now receives systems, computes per-faction counts, renders a .faction-count badge per row, and toggles .active alongside .off. Each button exposes its faction colour as --f. src/style.css: LCARS pill shape (border-radius 2px 12px 12px 2px), hover tint at 20% faction colour via color-mix, 3px faction-colour left border when active, count badge in Share Tech Mono (#666 when inactive, faction colour when active). 3D button no longer fights the badge for margin-left:auto."
         },
         {
           "id": "SA3.7",

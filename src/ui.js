@@ -135,7 +135,7 @@ export function initUI({ map, factions, systems }) {
   });
 
   // Faction filters
-  buildFactionFilters({ map, factions });
+  buildFactionFilters({ map, factions, systems });
 
   // Search
   buildSearch({ map, factions, systems });
@@ -143,18 +143,24 @@ export function initUI({ map, factions, systems }) {
   return ui;
 }
 
-function buildFactionFilters({ map, factions }) {
+function buildFactionFilters({ map, factions, systems }) {
   const list = document.getElementById('faction-list');
   list.innerHTML = '';
+  const counts = {};
+  for (const s of systems || []) counts[s.faction] = (counts[s.faction] || 0) + 1;
   Object.entries(factions).forEach(([id, f]) => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'faction-btn';
-    btn.innerHTML = `<span class="faction-dot" style="background:${f.css}"></span>${escapeHtml(f.name)}`;
+    btn.className = 'faction-btn active';
+    btn.style.setProperty('--f', f.css);
+    btn.innerHTML =
+      `<span class="faction-dot" style="background:${f.css}"></span>${escapeHtml(f.name)}` +
+      `<span class="faction-count">${counts[id] || 0}</span>`;
     btn.addEventListener('click', () => {
       const enabled = map.activeFactions.has(id);
       map.setFactionEnabled(id, !enabled);
       btn.classList.toggle('off', enabled);
+      btn.classList.toggle('active', !enabled);
     });
 
     const btn3d = document.createElement('button');
