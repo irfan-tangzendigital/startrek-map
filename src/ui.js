@@ -89,6 +89,11 @@ export function initUI({ map, factions, systems }) {
 
       infoPanel.classList.add('open');
 
+      // Restart the accent-bar pulse (class removal + reflow re-triggers it).
+      infoPanel.classList.remove('selected');
+      void infoPanel.offsetWidth;
+      infoPanel.classList.add('selected');
+
       // Scan-line sweep (0.6s) then content fade-in (0.3s).
       clearTimeout(infoPanel._scanTimer);
       infoPanel.classList.remove('panel-ready');

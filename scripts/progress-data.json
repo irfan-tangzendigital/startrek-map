@@ -136,8 +136,8 @@
         {
           "id": "SA3.4",
           "title": "Faction colour pulse on system select",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/style.css: keyframes faction-bar-pulse animates #info-faction-bar opacity 0.4 -> 1.0 -> 0.6 -> 1.0 over 0.8s (forwards, holds at 1.0), triggered by #info-panel.selected. src/ui.js openInfo(): removes .selected, forces reflow, re-adds it so the pulse restarts on every selection."
         },
         {
           "id": "SA3.5",
