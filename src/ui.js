@@ -122,6 +122,18 @@ export function initUI({ map, factions, systems }) {
 
   closeBtn.addEventListener('click', () => map.setSelectedSystem(null));
 
+  // Alert state Easter egg: 'A' cycles Normal -> Yellow Alert -> Red Alert.
+  const ALERT_STATES = ['', 'alert-yellow', 'alert-red'];
+  let alertIdx = 0;
+  document.addEventListener('keydown', (e) => {
+    if ((e.key || '').toLowerCase() !== 'a') return;
+    const tag = e.target?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    document.body.classList.remove('alert-yellow', 'alert-red');
+    alertIdx = (alertIdx + 1) % ALERT_STATES.length;
+    if (ALERT_STATES[alertIdx]) document.body.classList.add(ALERT_STATES[alertIdx]);
+  });
+
   // Faction filters
   buildFactionFilters({ map, factions });
 

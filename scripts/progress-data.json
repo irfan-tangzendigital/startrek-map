@@ -142,8 +142,8 @@
         {
           "id": "SA3.5",
           "title": "Alert state toggle (Easter egg)",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/style.css: added --accent (R,G,B triplet) and --accent-solid vars on :root; body.alert-yellow swaps them to #FFCC00 with an amber inset vignette, body.alert-red to #CC0000 with a slow 2.4s pulsing red border glow (body::after, pointer-events none, z-index 50). src/ui.js: keydown 'A' cycles Normal -> Yellow -> Red, ignored while typing in inputs. Full accent adoption across rules completed in SA3.7."
         },
         {
           "id": "SA3.6",
