@@ -91,6 +91,16 @@ export function initUI({ map, factions, systems }) {
     },
   };
 
+  // Stardate HUD — TNG-scale stardate derived from wall-clock time.
+  const stardateEl = document.getElementById('stardate');
+  function tickStardate() {
+    if (!stardateEl) return;
+    const stardate = 41000 + (Date.now() / 1000 / 3600 / 24 / 365.25) * 1000;
+    stardateEl.textContent = `STARDATE ${stardate.toFixed(1)}`;
+  }
+  tickStardate();
+  setInterval(tickStardate, 1000);
+
   // Controls
   document.getElementById('btn-zoom-in').addEventListener('click', () => map.zoomIn());
   document.getElementById('btn-zoom-out').addEventListener('click', () => map.zoomOut());

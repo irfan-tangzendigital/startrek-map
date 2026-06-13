@@ -118,8 +118,8 @@
         {
           "id": "SA3.1",
           "title": "Stardate HUD",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "index.html: added <span id='stardate'> to the #controls bottom bar next to the ly counter. src/ui.js: tickStardate() computes 41000 + (Date.now()/1000/3600/24/365.25)*1000, renders 'STARDATE NNNNN.N', updates every 1s via setInterval. src/style.css: #stardate in Share Tech Mono, #99CCFF at 70% opacity."
         },
         {
           "id": "SA3.2",

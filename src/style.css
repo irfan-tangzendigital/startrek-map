@@ -319,6 +319,7 @@ body {
 .ctrl-btn:hover { background: rgba(255,153,0,.15); }
 #reset-btn { width: auto; padding: 0 14px; font-size: 12px; letter-spacing: .14em; }
 #zoom-label { font-family: var(--font-data); font-size: 13px; color: rgba(255,204,170,.45); min-width: 44px; text-align: center; }
+#stardate { font-family: var(--font-data); font-size: 13px; color: #99CCFF; opacity: 0.7; letter-spacing: .08em; margin-left: 8px; }
 
 /* ── Coordinates ──────────────────────────────────────────── */
 #coords {
