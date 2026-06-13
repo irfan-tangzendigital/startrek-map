@@ -197,8 +197,8 @@
         {
           "id": "SA4.5",
           "title": "Atmosphere glow",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js buildSystemViewGroup(): Class M planets get a BackSide MeshBasicMaterial shell at radius*1.08, faction-tinted blue, opacity 0.12 (atmosphere halo). Star now carries AmbientLight(0x334455) + PointLight(0xffeedd, 1.4, range 10) so MeshStandardMaterial planets are lit from the star, plus an additive bloom sprite (makeBloomTexture) around the star core."
         },
         {
           "id": "SA4.6",

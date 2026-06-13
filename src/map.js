@@ -1100,6 +1100,24 @@ function buildSystemViewGroup(system, planets, THREE) {
   );
   group.add(star);
 
+  // Lighting for the MeshStandardMaterial planets: the star is the key light.
+  group.add(new THREE.AmbientLight(0x334455, 0.7));
+  const starLight = new THREE.PointLight(0xffeedd, 1.4, 10);
+  group.add(starLight);
+
+  // Additive bloom around the star.
+  const starBloom = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: makeBloomTexture(0xffddaa),
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      depthWrite: false,
+      opacity: 0.85,
+    }),
+  );
+  starBloom.scale.set(0.9, 0.9, 1);
+  group.add(starBloom);
+
   const planetMeshes = [];
   for (const p of planets) {
     const geo = new THREE.SphereGeometry(p.radius, 16, 16);
@@ -1109,6 +1127,22 @@ function buildSystemViewGroup(system, planets, THREE) {
     mesh.position.set(p.orbitRadius, 0, 0);
     group.add(mesh);
     planetMeshes.push({ config: p, mesh });
+
+    if (p.type === 'classM') {
+      // Atmosphere halo: slightly larger back-face shell, faction-tinted blue.
+      const atmoColor = new THREE.Color(0x66aaff).lerp(new THREE.Color(p.factionColor), 0.25);
+      const atmosphere = new THREE.Mesh(
+        new THREE.SphereGeometry(p.radius * 1.08, 16, 16),
+        new THREE.MeshBasicMaterial({
+          color: atmoColor,
+          transparent: true,
+          opacity: 0.12,
+          side: THREE.BackSide,
+          depthWrite: false,
+        }),
+      );
+      mesh.add(atmosphere);
+    }
 
     if (p.hasRing) {
       const planetRing = new THREE.Mesh(
