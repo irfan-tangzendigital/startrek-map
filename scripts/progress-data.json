@@ -130,8 +130,8 @@
         {
           "id": "SA3.3",
           "title": "Page boot sequence",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/main.js: runBootSequence(systemCount) builds a fullscreen #boot-overlay, types 4 LCARS boot lines at 0.3/0.6/0.9/1.2s (system count interpolated live: 1604 OBJECTS, stardate computed), fades out at 2.0s while body.booting releases #app/#ui to fade the map in. Skipped on refresh via sessionStorage 'lcars-booted'. src/style.css: overlay + .boot-line styling (Antonio, #FF9900 on #000) and fade transitions."
         },
         {
           "id": "SA3.4",
