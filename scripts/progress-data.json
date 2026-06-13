@@ -185,8 +185,8 @@
         {
           "id": "SA4.3",
           "title": "Planet orbital mechanics",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js: buildSystemViewGroup() places a central star, one sphere per planet and faint orbit-path rings in a Group at the system position; enterSystemView builds+adds it, exitSystemView removes and disposes all geometry/materials (disposeObject3D helper). updateSystemOrbits(t) in animate moves each planet: x/z circular orbit at orbitSpeed = 0.4/sqrt(orbitRadius) (inner planets faster, Kepler approximation), y = inclination * sin(angle)."
         },
         {
           "id": "SA4.4",

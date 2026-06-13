@@ -413,14 +413,42 @@ export async function initMap(systems, factions, callbacks = {}) {
 
   function enterSystemView(system) {
     if (systemView.active || !system?.pos3d) return;
-    systemView.active = true;
-    systemView.system = system;
+    try {
+      const planets = generatePlanets(system, factions, THREE);
+      const { group, planetMeshes } = buildSystemViewGroup(system, planets, THREE);
+      scene.add(group);
+      systemView.active = true;
+      systemView.system = system;
+      systemView.group = group;
+      systemView.planets = planetMeshes;
+    } catch {
+      /* system view unavailable — stay at galaxy level */
+    }
   }
 
   function exitSystemView() {
     if (!systemView.active) return;
+    if (systemView.group) {
+      scene.remove(systemView.group);
+      disposeObject3D(systemView.group);
+    }
     systemView.active = false;
     systemView.system = null;
+    systemView.group = null;
+    systemView.planets = [];
+  }
+
+  // Kepler-style orbital motion for the active system view.
+  function updateSystemOrbits(t) {
+    if (!systemView.active) return;
+    for (const { config: p, mesh } of systemView.planets) {
+      const a = t * p.orbitSpeed + p.orbitPhase;
+      mesh.position.set(
+        p.orbitRadius * Math.cos(a),
+        p.inclination * Math.sin(a),
+        p.orbitRadius * Math.sin(a),
+      );
+    }
   }
 
   function updatePulse(t) {
@@ -498,6 +526,7 @@ export async function initMap(systems, factions, callbacks = {}) {
     controls.update();
     updatePulse(t);
     tickSystemView();
+    updateSystemOrbits(t);
     updateLabelScale();
     updateLabelVisibility();
     renderer.render(scene, camera);
@@ -1024,6 +1053,56 @@ function generatePlanets(system, factions, THREE) {
   } catch {
     return [];
   }
+}
+
+// Placeholder material — replaced with typed materials in SA4.4.
+function makePlanetMaterial(p, THREE) {
+  return new THREE.MeshBasicMaterial({ color: p.factionColor });
+}
+
+// Builds the local solar system group centred on the system's position.
+function buildSystemViewGroup(system, planets, THREE) {
+  const group = new THREE.Group();
+  group.position.set(system.pos3d.x, system.pos3d.y, system.pos3d.z);
+
+  const star = new THREE.Mesh(
+    new THREE.SphereGeometry(0.12, 16, 16),
+    new THREE.MeshBasicMaterial({ color: 0xffeecc }),
+  );
+  group.add(star);
+
+  const planetMeshes = [];
+  for (const p of planets) {
+    const mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(p.radius, 16, 16),
+      makePlanetMaterial(p, THREE),
+    );
+    mesh.position.set(p.orbitRadius, 0, 0);
+    group.add(mesh);
+    planetMeshes.push({ config: p, mesh });
+
+    const orbit = new THREE.Mesh(
+      new THREE.RingGeometry(p.orbitRadius - 0.0025, p.orbitRadius + 0.0025, 64),
+      new THREE.MeshBasicMaterial({
+        color: 0x334455,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.25,
+        depthWrite: false,
+      }),
+    );
+    orbit.rotation.x = -Math.PI / 2;
+    group.add(orbit);
+  }
+  return { group, planetMeshes };
+}
+
+function disposeObject3D(root) {
+  root.traverse((obj) => {
+    obj.geometry?.dispose?.();
+    if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose?.());
+    else obj.material?.dispose?.();
+  });
 }
 
 function buildCapitalGroup(sys, color, THREE) {
