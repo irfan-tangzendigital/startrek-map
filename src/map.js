@@ -341,7 +341,8 @@ export async function initMap(systems, factions, callbacks = {}) {
   renderer.domElement.addEventListener('wheel', bumpAutoRotate, { passive: true });
 
   function tickIdleDrift(delta) {
-    if (flyTo || Date.now() - lastInteraction < IDLE_DRIFT_DELAY_MS) return;
+    if (flyTo || systemView.active || systemView.transition) return;
+    if (Date.now() - lastInteraction < IDLE_DRIFT_DELAY_MS) return;
     // Rotate the camera about the target's vertical axis — preserves the
     // current zoom radius and elevation rather than snapping to a fixed orbit.
     camera.position.sub(controls.target);
@@ -411,6 +412,26 @@ export async function initMap(systems, factions, callbacks = {}) {
     }
   }
 
+  function hideGalaxyObjects() {
+    systemView.hidden = [];
+    const hide = (obj) => {
+      if (!obj) return;
+      systemView.hidden.push({ obj, visible: obj.visible });
+      obj.visible = false;
+    };
+    for (const layers of factionCloudMeshes.values()) layers.forEach(hide);
+    for (const sprite of factionLabelSprites.values()) hide(sprite);
+    twinkleObjects.forEach(hide);
+    capitalOrbiters.forEach((o) => hide(o.mesh));
+    capitalGroups.forEach(hide);
+    majorData.forEach(hide);
+  }
+
+  function restoreGalaxyObjects() {
+    for (const { obj, visible } of systemView.hidden) obj.visible = visible;
+    systemView.hidden = [];
+  }
+
   function enterSystemView(system) {
     if (systemView.active || !system?.pos3d) return;
     try {
@@ -421,21 +442,68 @@ export async function initMap(systems, factions, callbacks = {}) {
       systemView.system = system;
       systemView.group = group;
       systemView.planets = planetMeshes;
+      systemView.savedCam = camera.position.clone();
+      systemView.savedTarget = controls.target.clone();
+
+      flyTo = null; // cancel any in-flight galaxy fly-to
+      clearSelectionWire();
+      hideGalaxyObjects();
+
+      const p = system.pos3d;
+      systemView.transition = {
+        fromCam: camera.position.clone(),
+        toCam: new THREE.Vector3(p.x, p.y + 1.0, p.z + 2.0),
+        fromTarget: controls.target.clone(),
+        toTarget: new THREE.Vector3(p.x, p.y, p.z),
+        t0: performance.now(),
+        dur: 1200,
+      };
+      callbacks.onSystemView?.(system, planets);
     } catch {
       /* system view unavailable — stay at galaxy level */
     }
   }
 
-  function exitSystemView() {
+  function exitSystemView({ tweenBack = false } = {}) {
     if (!systemView.active) return;
+    const sys = systemView.system;
     if (systemView.group) {
       scene.remove(systemView.group);
       disposeObject3D(systemView.group);
     }
+    restoreGalaxyObjects();
     systemView.active = false;
     systemView.system = null;
     systemView.group = null;
     systemView.planets = [];
+
+    if (tweenBack && systemView.savedCam && sys?.pos3d) {
+      // Return at least 3.5 units out so the entry threshold (1.5) can't
+      // immediately re-fire from the restored position.
+      const sysPos = new THREE.Vector3(sys.pos3d.x, sys.pos3d.y, sys.pos3d.z);
+      const dir = systemView.savedCam.clone().sub(sysPos);
+      if (dir.lengthSq() < 1e-6) dir.set(0, 1, 1);
+      dir.setLength(Math.max(dir.length(), 3.5));
+      systemView.transition = {
+        fromCam: camera.position.clone(),
+        toCam: sysPos.clone().add(dir),
+        fromTarget: controls.target.clone(),
+        toTarget: systemView.savedTarget?.clone() || sysPos,
+        t0: performance.now(),
+        dur: 1000,
+      };
+    }
+    callbacks.onSystemView?.(null, []);
+  }
+
+  function updateSystemTransition(now) {
+    const tr = systemView.transition;
+    if (!tr) return;
+    const k = Math.min(1, (now - tr.t0) / tr.dur);
+    const e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; // easeInOut
+    camera.position.lerpVectors(tr.fromCam, tr.toCam, e);
+    controls.target.lerpVectors(tr.fromTarget, tr.toTarget, e);
+    if (k >= 1) systemView.transition = null;
   }
 
   // Kepler-style orbital motion for the active system view.
@@ -523,6 +591,7 @@ export async function initMap(systems, factions, callbacks = {}) {
     updateAmbient(t);
     const now = performance.now();
     updateFlyTo(now);
+    updateSystemTransition(now);
     controls.update();
     updatePulse(t);
     tickSystemView();

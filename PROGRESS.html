@@ -38,8 +38,8 @@
   <h1>★ STELLAR CARTOGRAPHY — ENHANCEMENT PROGRESS</h1>
   <div style="font-family:'Share Tech Mono',monospace;font-size:13px;color:#99CCFF">OVERALL COMPLETION</div>
   
-  <div class="bar"><div class="bar-fill" style="width:91%;background:#FF9900"></div>
-  <span class="bar-label">29 / 32</span></div>
+  <div class="bar"><div class="bar-fill" style="width:94%;background:#FF9900"></div>
+  <span class="bar-label">30 / 32</span></div>
   
   <section class="priority">
     <div class="p-header" style="border-color:#FF9900">
@@ -269,8 +269,8 @@
       <h2 style="color:#44CCBB">PRIORITY 4 — SYSTEM DETAIL ON ZOOM</h2>
     </div>
     
-  <div class="bar"><div class="bar-fill" style="width:63%;background:#44CCBB"></div>
-  <span class="bar-label">5 / 8</span></div>
+  <div class="bar"><div class="bar-fill" style="width:75%;background:#44CCBB"></div>
+  <span class="bar-label">6 / 8</span></div>
     
   <div class="task">
     <div class="task-head">
@@ -316,9 +316,9 @@
     <div class="task-head">
       <span class="said">SA4.6</span>
       <span class="task-title">Camera transition into system</span>
-      <span class="badge todo">TODO</span>
+      <span class="badge done">DONE</span>
     </div>
-    
+    <details class="detail"><summary>CHANGE LOG</summary><div class="detail-body">src/map.js enterSystemView(): saves camera/target, cancels fly-to, clears the selection wire, hides all galaxy-level objects (cloud layers, faction labels, minor Points, orbiters, capital/major groups) with prior visibility recorded, then tweens camera to (x, y+1.0, z+2.0) looking at the system over 1.2s easeInOut (updateSystemTransition in animate). Idle drift suppressed while system view or its transition is active; threshold checks paused mid-tween. exitSystemView() restores all visibility and disposes the group.<div class="shot-placeholder">NO VISUAL RECORD</div></div></details>
   </div>
   <div class="task">
     <div class="task-head">
@@ -337,6 +337,6 @@
     
   </div>
   </section>
-  <footer>LAST UPDATED: 2026-06-13T00:09:12.492Z</footer>
+  <footer>LAST UPDATED: 2026-06-13T00:10:24.622Z</footer>
 </body>
 </html>

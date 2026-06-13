@@ -203,8 +203,8 @@
         {
           "id": "SA4.6",
           "title": "Camera transition into system",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/map.js enterSystemView(): saves camera/target, cancels fly-to, clears the selection wire, hides all galaxy-level objects (cloud layers, faction labels, minor Points, orbiters, capital/major groups) with prior visibility recorded, then tweens camera to (x, y+1.0, z+2.0) looking at the system over 1.2s easeInOut (updateSystemTransition in animate). Idle drift suppressed while system view or its transition is active; threshold checks paused mid-tween. exitSystemView() restores all visibility and disposes the group."
         },
         {
           "id": "SA4.7",
