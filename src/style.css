@@ -152,6 +152,33 @@ body {
 }
 #info-panel.open { right: 0; }
 
+/* Scan-line "compiling" animation when the panel opens */
+#info-panel::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: -4px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--lcars-orange), transparent);
+  box-shadow: 0 0 12px var(--lcars-orange);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+#info-panel.panel-scanning::before {
+  animation: panel-scan .6s linear forwards;
+}
+@keyframes panel-scan {
+  from { top: 0; opacity: 1; }
+  to   { top: calc(100% - 3px); opacity: 1; }
+}
+#info-panel.panel-scanning #info-header,
+#info-panel.panel-scanning #info-stats,
+#info-panel.panel-scanning #info-body { opacity: 0; }
+#info-panel.panel-ready #info-header,
+#info-panel.panel-ready #info-stats,
+#info-panel.panel-ready #info-body { animation: panel-fade-in .3s ease-out; }
+@keyframes panel-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
 /* Faction color bar on left edge */
 #info-faction-bar {
   position: absolute; left: 0; top: 0; bottom: 0;

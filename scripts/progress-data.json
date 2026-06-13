@@ -124,8 +124,8 @@
         {
           "id": "SA3.2",
           "title": "Info panel scan-line animation",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "src/style.css: #info-panel::before is an orange glowing scan line; .panel-scanning sweeps it top-to-bottom over 0.6s (keyframes panel-scan) while header/stats/body are held at opacity 0; .panel-ready fades content in over 0.3s (panel-fade-in). src/ui.js openInfo(): adds .panel-scanning on open, swaps to .panel-ready after 600ms, with timer cleanup for rapid re-selection."
         },
         {
           "id": "SA3.3",

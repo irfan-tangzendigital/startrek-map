@@ -88,6 +88,15 @@ export function initUI({ map, factions, systems }) {
         : 'https://memory-alpha.fandom.com/wiki/Main_Page';
 
       infoPanel.classList.add('open');
+
+      // Scan-line sweep (0.6s) then content fade-in (0.3s).
+      clearTimeout(infoPanel._scanTimer);
+      infoPanel.classList.remove('panel-ready');
+      infoPanel.classList.add('panel-scanning');
+      infoPanel._scanTimer = setTimeout(() => {
+        infoPanel.classList.remove('panel-scanning');
+        infoPanel.classList.add('panel-ready');
+      }, 600);
     },
   };
 
