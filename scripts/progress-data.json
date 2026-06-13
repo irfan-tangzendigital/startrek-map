@@ -209,8 +209,8 @@
         {
           "id": "SA4.7",
           "title": "Back navigation",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "index.html: added #return-galaxy '← RETURN TO GALAXY' button. src/style.css: LCARS pill styling top-left, shown only while body.system-view is set (search panel hidden in that state to avoid overlap). src/map.js: enter/exit toggle the body class; clicking the button calls exitSystemView({tweenBack:true}) which restores galaxy objects and tweens the camera back over 1.0s to the pre-entry direction, pushed out to >=3.5 units so the 1.5-unit entry threshold cannot instantly re-fire."
         },
         {
           "id": "SA4.8",

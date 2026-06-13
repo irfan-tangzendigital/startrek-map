@@ -433,6 +433,30 @@ body.booting #app, body.booting #ui { opacity: 0; }
   letter-spacing: .14em; pointer-events: none;
 }
 
+/* ── System view: return to galaxy ────────────────────────── */
+#return-galaxy {
+  display: none;
+  position: absolute;
+  top: 16px; left: 16px;
+  pointer-events: all;
+  background: var(--lcars-panel);
+  border: 1px solid rgba(var(--accent), .5);
+  border-radius: 2px 14px 14px 2px;
+  border-left: 4px solid var(--accent-solid);
+  color: var(--accent-solid);
+  font-family: var(--font-lcars);
+  font-size: 14px; font-weight: 700;
+  letter-spacing: .14em;
+  padding: 10px 16px;
+  cursor: pointer;
+  z-index: 15;
+  transition: background .15s;
+}
+#return-galaxy:hover { background: rgba(var(--accent), .18); }
+body.system-view #return-galaxy { display: block; }
+/* hide galaxy-level search while inside a system */
+body.system-view #search-panel { display: none; }
+
 /* ── Mobile (≤600px) ──────────────────────────────────────── */
 #faction-toggle { display: none; }
 

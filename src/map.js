@@ -458,6 +458,7 @@ export async function initMap(systems, factions, callbacks = {}) {
         t0: performance.now(),
         dur: 1200,
       };
+      document.body.classList.add('system-view');
       callbacks.onSystemView?.(system, planets);
     } catch {
       /* system view unavailable — stay at galaxy level */
@@ -493,8 +494,12 @@ export async function initMap(systems, factions, callbacks = {}) {
         dur: 1000,
       };
     }
+    document.body.classList.remove('system-view');
     callbacks.onSystemView?.(null, []);
   }
+  document.getElementById('return-galaxy')?.addEventListener('click', () => {
+    exitSystemView({ tweenBack: true });
+  });
 
   function updateSystemTransition(now) {
     const tr = systemView.transition;
