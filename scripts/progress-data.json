@@ -105,8 +105,8 @@
         {
           "id": "SA2.8",
           "title": "Final positioning calibration",
-          "status": "TODO",
-          "summary": ""
+          "status": "DONE",
+          "summary": "Screenshot-verified label placement against territory clouds on the running dev server (calibration-default.png): UFP/FA/RSE/KE/CU centred over their clusters with ~1.5-2.0 unit clearance above flattened cloud tops, no overlaps at default zoom. Adjusted src/map.js FACTION_LABEL_POS: dominion (-1.0,1.6,9.5)->(0.0,0.4,11.0) to sit over its actual cluster (0,-1.5,11), breen y 1.6->1.0 (cluster is below the plane at y -0.6)."
         }
       ]
     },

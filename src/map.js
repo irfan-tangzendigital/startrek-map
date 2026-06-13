@@ -845,8 +845,10 @@ const FACTION_LABEL_POS = {
   romulan:     { x: 5.5,  y: 1.8, z: -3.8 },
   cardassian:  { x: -7.2, y: 2.0, z: 5.2  },
   ferengi:     { x: -6.7, y: 1.8, z: -2.7 },
-  breen:       { x: -5.5, y: 1.6, z: 7.5  },
-  dominion:    { x: -1.0, y: 1.6, z: 9.5  },
+  // breen/dominion clusters sit below the galactic plane (y -0.6 / -1.5),
+  // so their labels hang lower than the spec defaults to stay attached.
+  breen:       { x: -5.5, y: 1.0, z: 7.5  },
+  dominion:    { x:  0.0, y: 0.4, z: 11.0 },
 };
 
 function buildFactionLabels(scene, factions, THREE) {
