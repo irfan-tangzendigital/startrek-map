@@ -1,4 +1,5 @@
 import { openSectorView } from './sector-view.js';
+import { searchSystems } from './search.js';
 
 export function initUI({ map, factions, systems }) {
   const infoPanel = document.getElementById('info-panel');
@@ -241,35 +242,20 @@ function buildSearch({ map, factions, systems }) {
 
   input.addEventListener('input', () => {
     console.log('[search] systems:', Array.isArray(systems), systems?.length);
-    const q = input.value.trim().toLowerCase();
     results.innerHTML = '';
-    if (!q) return;
-
-    systems
-      .filter((s) => {
-        const normalised = (s.name || '').toLowerCase().replaceAll(' system', '');
-        const faction = (s.faction || '').toLowerCase();
-        return (
-          normalised.includes(q) ||
-          (s.subtitle || '').toLowerCase().includes(q) ||
-          (s.id || '').toLowerCase().includes(q) ||
-          faction.includes(q)
-        );
-      })
-      .slice(0, 8)
-      .forEach((sys) => {
-        const el = document.createElement('div');
-        el.className = 'search-result';
-        el.innerHTML = `<div>${escapeHtml(sys.name)}</div><div class="search-result-sub">${escapeHtml(
-          factions[sys.faction]?.name ?? '',
-        )}</div>`;
-        el.addEventListener('click', () => {
-          input.value = sys.name;
-          results.innerHTML = '';
-          map.flyTo(sys);
-        });
-        results.appendChild(el);
+    searchSystems(systems, input.value).forEach((sys) => {
+      const el = document.createElement('div');
+      el.className = 'search-result';
+      el.innerHTML = `<div>${escapeHtml(sys.name)}</div><div class="search-result-sub">${escapeHtml(
+        factions[sys.faction]?.name ?? '',
+      )}</div>`;
+      el.addEventListener('click', () => {
+        input.value = sys.name;
+        results.innerHTML = '';
+        map.flyTo(sys);
       });
+      results.appendChild(el);
+    });
   });
 
   document.addEventListener('click', (e) => {
